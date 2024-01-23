@@ -1,0 +1,141 @@
+---
+title: "Introduction to LegATo"
+author: 
+- name: Aubrey R. Odom
+  affiliation: 
+  - Program in Bioinformatics, Boston University, Boston, MA
+  email: aodom@bu.edu
+date: '`r format(Sys.Date(), "%B %e, %Y")`'
+package: LegATo
+output: 
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Introdution to MetaScope}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+# Introduction to LegATo: Longitudinal mEtaGenomic Analysis TOolkit
+
+## Streamlining longitudinal microbiome profiling in Bioconductor
+
+LegATo is a suite of open-source software tools for longitudinal microbiome analysis that is extendable to several different study forms with optimal ease-of-use for researchers. Microbiome time-series data presents distinct challenges including complex covariate dependencies and variety of longitudinal study designs. This toolkit will allow researchers to determine which microbial taxa are affected over time by perturbations such as onset of disease or lifestyle choices, and to predict the effects of these perturbations over time, including changes in composition or stability of commensal bacteria. 
+
+LegATo integrates visualization, modeling and testing procedures. It will be supplemented by hierarchical clustering tools and multivariate generalized estimating equations (JGEEs) to adjust for the compositional nature of microbiome data.
+
+# Setup
+
+```{R}
+library(LegATo)
+library(tidyverse)
+```
+
+# Data
+We will be utilizing nasopharyngeal microbiome data from Zambian Infants from Odom et al.:
+
+```{R, eval = FALSE}
+dat <- readRDS("inst/extdata/MAE.RDS")
+
+# Fix this
+#dat_0.05 <- clean_animalcules_MAE(dat) %>% filter_animalcules_MAE(0.05)
+dat_0.05 <- filter_animalcules_MAE(dat, 0.05)
+
+parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
+parsed$sam
+```
+
+```{R, eval = FALSE}
+alluvial_df <- get_long_data(dat_0.05, "genus")
+```
+
+```{R}
+group_vars <- c("HIVStatus", "MothChild")
+get_summary_table(dat_0.05, group_vars)
+```
+
+
+```{R}
+best_genus <- get_top_taxa(dat_0.05, "genus")
+best_species <- get_top_taxa(dat_0.05, "species")
+```
+
+```{R}
+this_palette <- paletteer::palettes_d[["ggsci"]]["category20_d3"] |>
+    unlist() |> unname()
+
+plot_stacked_area(dat_0.05, "genus", 
+                         "HIVStatus",
+                         "timepoint",
+                         palette_input = this_palette)
+```
+
+```{R}
+
+plot_stacked_bar(dat_0.05, "genus", 
+             "HIVStatus",
+             "timepoint",
+             palette_input = this_palette)
+```
+
+```{R}
+
+plot_alluvial(dat = dat_0.05, 
+              taxon_level = "genus", 
+              covariate_1 = "HIVStatus",
+              covariate_time = "timepoint",
+              palette_input = this_palette,
+              subtitle = "Alluvial plot")
+```
+
+
+```{R}
+
+taxon_level <- "genus"
+time_var <- "timepoint"
+unit_var <-  "Subject"
+color_var <- "HIVStatus"
+plot_spaghetti(dat_0.05,
+               taxon_level = "genus",
+               time_var,
+               unit_var,
+               color_var,
+               which_taxon = "Corynebacterium",
+               xlabel = "Infant Age (Days)",
+               ylabel = "Relative Abundance (log CPM)")
+```
+
+# Add hotelling
+
+```{R, eval = FALSE}
+test_hotelling_t2(dat = dat_0.05,
+                    test_time = 6,
+                    test_index = which(dat_0.05$MothChild == "Infant" &
+                                         dat_0.05$timepoint == 6),
+                    taxon_level = "genus",
+                    # To avoid n < p, use top 5-6 species
+                    num_taxa = 6,
+                    paired = TRUE,
+                    grouping_var = "HIVStatus",
+                    pairing_var = "pairing")
+
+test_hotelling_t2(dat = dat_0.05,
+                    test_time = 0,
+                    test_index = which(dat_0.05$MothChild == "Mother" &
+                                        dat_0.05$timepoint == 0),
+                    taxon_level = "genus",
+                    # To avoid n < p, use top 5-6 species
+                    num_taxa = 12,
+                    grouping_var = "HIVStatus",
+                    unique_id_var = "Subject",
+                    paired = FALSE)
+    
+```
+
+
+```{R}
+sessionInfo()
+```
+
+

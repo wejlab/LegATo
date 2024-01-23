@@ -1,0 +1,214 @@
+## Unpaired multivariate Hotelling's T-squared
+# Sources: https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.14
+# Also https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.15
+# Null hypothesis: population mean vectors are equal
+# Alternative: mean vectors are not equal
+
+.Hotelling_mv_T2_un <- function(input_data, Populations, Subjects,
+                                taxon = "taxon") {
+  # Rename groups
+  input_data <- input_data %>%
+    dplyr::select(Populations = dplyr::starts_with(Populations),
+                  Subjects = dplyr::starts_with(Subjects),
+                  Taxon = dplyr::starts_with(taxon),
+                  Abundance)
+  Group1 <- unique(input_data$Populations)[1]
+  Sub1 <- input_data %>% dplyr::filter(Populations == Group1) %>% 
+    dplyr::distinct(Subjects) %>% dplyr::ungroup() %>% 
+    dplyr::select(Subjects) %>% unlist()
+  Group2 <- unique(input_data$Populations)[2]
+  Sub2 <- input_data %>% dplyr::filter(Populations == Group2) %>% 
+    dplyr::distinct(Subjects) %>% dplyr::ungroup() %>%
+    dplyr::select(Subjects) %>% unlist()
+  # Define n
+  n <- input_data %>% dplyr::group_by(Populations) %>%
+    dplyr::distinct(Subjects) %>% dplyr::summarize(n_col = dplyr::n())
+  n1 <- n %>% dplyr::filter(Populations == Group1) %>%
+    dplyr::select(`n_col`) %>% as.numeric()
+  n2 <- n %>% dplyr::filter(Populations == Group2) %>%
+    dplyr::select(`n_col`) %>% as.numeric()
+  p <- length(unique(input_data$Taxon))
+  # Sample mean vector
+  X_i <- input_data %>%
+    dplyr::rename(Xi = "Abundance")
+  Xbar <- X_i %>%
+    dplyr::group_by(Populations, Taxon) %>%
+    dplyr::summarise(Xbar = mean(Xi), .groups = "drop")
+  # X_i - Xbar
+  diff <- X_i %>%
+    dplyr::left_join(., Xbar, by = c("Populations", "Taxon")) %>%
+    dplyr::group_by(Subjects, Taxon) %>%
+    dplyr::summarise(diff = Xi - Xbar, .groups = "drop")
+  # (X_ij-Xbar_i)%*%(X_ij-Xbar_i)'
+  mult_func <- function(x) {
+    vec <- t(t(diff$diff[diff$Subjects == x]))
+    vec %*% t(vec)
+  }
+  # Calculate S_p
+  # Sample Var-cov matrix of vecs Y_i
+  S_1 <- 1/(n1 - 1) * base::Reduce("+", lapply(Sub1, mult_func))
+  S_2 <- 1/(n2 - 1) * base::Reduce("+", lapply(Sub2, mult_func))
+  S_p <- ((n1 - 1) * S_1 + (n2 - 1) * S_2) / (n1 + n2 - 2)
+  
+  # T^2 = t(Xbar_1-Xbar_2) %*% {S_p(1/n1 + 1/n2)}^-1 %*% (Xbar_1-Xbar_2)
+  Xbar_1 <- Xbar %>% dplyr::filter(Populations == Group1) %>% dplyr::select(Xbar)
+  Xbar_2 <- Xbar %>% dplyr::filter(Populations == Group2) %>% dplyr::select(Xbar)
+  meandiff <- t(t(Xbar_1 - Xbar_2))
+  T_2 <- t(meandiff) %*% solve(S_p * (1 / n1 + 1 / n2)) %*% meandiff
+  
+  #F statistic
+  # Dist according to F_p, n1 + n2 - p - 1
+  F_stat <- (n1 + n2 - p - 1) / (p * (n1 + n2 - 2)) * T_2
+  # Reject H0 at alpha if F-val exceeds
+  df1 <- p
+  df2 <- n1 + n2 - p - 1
+  crit_F <- qf(0.95, df1, df2)
+  pval <- 1 - pf(c(F_stat), df1, df2)
+  
+  if(pval < 0.05) {
+    ttest_unpaired <- function(tax) {
+      for_testing <- input_data %>% dplyr::filter(Taxon == tax)
+      out_test <- t.test(Abundance ~ Populations, for_testing,
+                         alternative = "two.sided",
+                         var.equal = FALSE, paired = FALSE)
+      return(list(t = out_test$statistic, df = out_test$parameter,
+                  diff_means = out_test$estimate[1],
+                  CI_2.5 = out_test$conf.int[1],
+                  CI_97.5 = out_test$conf.int[2],
+                  "p-value" = out_test$p.value))
+    }
+    results <- sapply(unique(input_data$Taxon), ttest_unpaired)
+    results <- rbind(results,
+                     "adj p-value" = p.adjust(results["p-value", ],
+                                              method = "bonferroni"))
+    
+    message("Results from t-tests:")
+    print(results)
+  }
+  
+  list(df1 = df1, df2 = df2, crit_F = crit_F,
+       F_stat = F_stat[1], pvalue = pval)
+}
+
+
+
+#' Paired Multivariate Hotelling's T-Squared Test
+#'
+#' This function performs a paired version of a multivariate
+#' Hotelling's T-squared test.
+#' 
+#' Null hypothesis: population mean vectors are equal
+#'  Alternative: mean vectors are not equal
+#' 
+#' Source: https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.4
+#' Example: https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.9
+
+.Hotelling_mv_T2 <- function(input, Group1, Group2){
+  # Rename groups
+  input_data <- input %>% dplyr::select(pairing,
+                                        Taxon = "taxon",
+                                        Group1 = tidyr::starts_with(Group1),
+                                        Group2 = tidyr::starts_with(Group2))
+  # Define n
+  all_pairs <- unique(input_data$pairing)
+  n <- length(all_pairs)
+  p <- length(unique(input_data$Taxon))
+  # Sample mean vector
+  Y_i <- input_data %>%
+    dplyr::group_by(pairing, Taxon) %>%
+    dplyr::summarise(Yi = `Group1` - `Group2`,
+                     .groups = "drop")
+  Ybar <- Y_i %>%
+    dplyr::group_by(Taxon) %>%
+    dplyr::summarise(Ybar = mean(`Yi`),
+                     .groups = "drop")
+  # Y_i - Ybar
+  diff <- Y_i %>%
+    dplyr::left_join(., Ybar, by = "Taxon") %>%
+    dplyr::group_by(pairing, Taxon) %>%
+    dplyr::summarise(diff = Yi - Ybar, .groups = "drop")
+  # (y_i-Ybar)%*%(y_i-Ybar)'
+  mult_func <- function(x) {
+    vec <- t(t(diff$diff[diff$pairing == x]))
+    vec %*% t(vec)
+  }
+  # Calculate S_Y
+  # Sample Var-cov matrix of vecs Y_i
+  S_Y <- 1/(n - 1) * base::Reduce("+", lapply(all_pairs, mult_func))
+  # Calculate T^2
+  # T^2 = n*Ybar'*inv(S_Y)*Ybar
+  Ybar_v <- t(t(Ybar$Ybar))
+  T_2 <- n * t(Ybar_v) %*% solve(S_Y) %*% Ybar_v
+  #F statistic
+  # Dist according to F_p,n-p
+  F_stat <- (n - p) / (p * (n - 1)) * T_2
+  # Reject H0 at alpha if F-val exceeds
+  df1 <- p
+  df2 <- n - p
+  crit_F <- qf(0.95, df1, df2)
+  pval <- 1 - pf(c(F_stat), df1, df2)
+  
+  # Conduct a paired t-test
+  # Following # 1 in R&C pg. 140
+  if(pval < 0.05) {
+    ttest_paired <- function(tax) {
+      for_testing <- input_data %>% dplyr::filter(Taxon == tax)
+      out_test <- t.test(x = for_testing$Group1,
+                         y = for_testing$Group2,
+                         alternative = "two.sided",
+                         paired = TRUE, var.equal = TRUE)
+      output <- list(t = as.numeric(out_test$statistic),
+                     df = as.numeric(out_test$parameter),
+                     diff_means = as.numeric(out_test$estimate),
+                     CI_2.5 = as.numeric(out_test$conf.int[1]),
+                     CI_97.5 = as.numeric(out_test$conf.int[2]),
+                     "p-value" = as.numeric(out_test$p.value))
+      return(lapply(output, base::round, digits = 4))
+    }
+    results <- sapply(unique(input_data$Taxon), ttest_paired)
+    results <- rbind(results, "adj p-value" = p.adjust(results["p-value", ],
+                                                       method = "bonferroni"))
+    write.csv(results, "PaperFigs/pairedttest_HIV_mothinf.csv")
+    message("Results from t-tests:")
+    print(results)
+  }
+  
+  return(list(df1 = df1, df2 = df2, crit_F = crit_F,
+              F_stat = F_stat[1], pvalue = pval))
+}
+
+#' run_Hotelling_mv_T2
+# Remove pairs with any missing values. Note this
+test_hotelling_t2 <- function(dat, test_index,
+                                test_time, taxon_level = "genus",
+                                num_taxa, grouping_var, paired = FALSE,
+                                pairing_var = NULL, unique_id_var = NULL) {
+  MAE <- MultiAssayExperiment::subsetByColData(dat, test_index)
+  best_taxa <- get_top_taxa(MAE, taxon_level) %>%
+    dplyr::pull(taxa)
+  input_data <- get_long_data(MAE, taxon_level, log = TRUE,
+                            counts_to_CPM = TRUE) %>%
+    dplyr::filter(taxon %in% best_taxa[seq_len(num_taxa)]) 
+  
+  if (paired) {
+    if (is.null(pairing_var)) message("Please supply pairing_var if paired = TRUE")
+    output_data <- input_data %>%
+      dplyr::select(dplyr::all_of(c(grouping_var, pairing_var)), taxon,
+                    Abundance) %>%
+      tidyr::pivot_wider(., id_cols =
+                           dplyr::all_of(c("taxon", pairing_var)),
+                         values_from = Abundance,
+                         names_from = dplyr::all_of(grouping_var)) %>%
+      dplyr::arrange(pairing) %>%
+      dplyr::filter(!dplyr::if_any(tidyselect::everything(), is.na))
+    results <- .Hotelling_mv_T2(output_data, "HIV", "Control")
+  } else {
+    if (is.null(unique_id_var)) message("Please supply unique_id_var if paired = FALSE")
+    output_data <- input_data %>%
+      dplyr::select(taxon, Subject, dplyr::all_of(c(grouping_var)), Abundance) %>%
+      dplyr::arrange(Subject) %>%
+      dplyr::filter(!dplyr::if_any(tidyselect::everything(), is.na))
+    results <- .Hotelling_mv_T2_un(output_data, grouping_var, unique_id_var, "taxon")
+  }
+  return(results)
+}

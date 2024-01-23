@@ -1,0 +1,71 @@
+
+## Heatmaps
+
+Note: I included all of the visits, not just three and four. I can change this if needed.
+
+```{R}
+counts_genus <- upsample_counts(counts_table, tax_table, "genus")
+
+# Heatmap main colors
+mat <- as.matrix(counts_table)
+use_cols <- c("#377EB8", "white", "#E41A1C")
+seq_cols <- seq(min(mat, na.rm = TRUE),
+                max(mat, na.rm = TRUE)/2,
+                length.out = length(use_cols))
+body_col <- circlize::colorRamp2(seq_cols,
+                                 use_cols)
+
+# Annotation colors
+all_samples <- unique(sam_table$Sample)
+num_samples <- length(all_samples)
+colorset1 <- unlist(paletteer::palettes_d[["ggsci"]]["default_igv"])
+colorset2 <- unlist(paletteer::palettes_d[["ggsci"]]["springfield_simpsons"])
+colorset3 <- paletteer::paletteer_c("ggthemes::Blue-Green Sequential",
+                                    n = length(unique(
+                                      sam_table$Nugent.Scores.Categories))) %>%
+  as.character()
+colorset4 <- c("skyblue", "purple")
+cst_col <- setNames(colorset1[seq_along(unique(sam_table$CST))],
+                    unique(sam_table$CST))
+subcst_col <- setNames(colorset2[seq_along(unique(sam_table$subCST))],
+                       unique(sam_table$subCST))
+vd_col <- setNames(colorset3,
+                   sort(factor(unique(sam_table$Nugent.Scores.Categories))))
+grp_col <- setNames(colorset4,
+                    sort(factor(unique(sam_table$Group))))
+colList <- list(CST = cst_col,
+                subCST = subcst_col,
+                Nugent.Scores = vd_col,
+                Group = grp_col)
+
+# Top annotation (sample-based)
+annot_df <- data.frame(CST = sam_table$CST,
+                       subCST = sam_table$subCST,
+                       Nugent.Scores = 
+                         factor(sam_table$Nugent.Scores.Categories),
+                       Group = sam_table$Group)
+colList <-
+  topha <- ComplexHeatmap::HeatmapAnnotation(
+    df = annot_df,
+    col = colList,
+    show_legend = TRUE, show_annotation_name = TRUE)
+
+h <- as.matrix(counts_table) %>%
+  ComplexHeatmap::Heatmap(
+    column_title = "Sample",
+    top_annotation = topha,
+    name = "Raw reads",
+    show_column_names = FALSE,
+    show_row_names = TRUE,
+    column_title_side = "bottom",
+    column_order = order(sam_table$subCST),
+    rect_gp = grid::gpar(col = "white", lwd = 0.5),
+    col = body_col
+  )
+
+png(filename = "PaperFigs/Heatmap_CST.png",
+    width = 9, units = "in", res = 120,
+    height = 7)
+h
+dev.off()
+

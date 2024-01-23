@@ -1,0 +1,51 @@
+Package: LegATo
+Title: LegATo: Longitudinal mEtaGenomic Analysis Toolkit
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Aubrey", "Odom", , "aodom@bu.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-7113-7598")),
+    person("Jared", "Pincus", , "pincus@bu.edu", role = "csl"),
+    person("Jordan", "Pincus", , "pincus@bu.edu", role = "art")
+  )
+Description: Streamlining longitudinal microbiome profiling in
+    Bioconductor.
+License: MIT + file LICENSE
+Depends:
+    R (>= 4.3.0)
+Imports:
+    alluvial,
+    animalcules,
+    emmeans,
+    geepack,
+    ggeffects,
+    lme4,
+    magrittr,
+    MultiAssayExperiment,
+    rlang,
+    SummarizedExperiment,
+    S4Vectors,
+    TBSignatureProfiler,
+    dplyr,
+    ggalluvial,
+    ggplot2,
+    stringr,
+    tibble,
+    tidyr,
+    tidyselect
+Suggests:
+    BiocStyle,
+    biomformat,
+    knitr,
+    lintr,
+    plyr,
+    R.utils,
+    rmarkdown,
+    Rsubread,
+    spelling,
+    sys,
+    testthat,
+    usethis
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3

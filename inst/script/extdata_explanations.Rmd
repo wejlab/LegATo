@@ -1,0 +1,62 @@
+---
+title: "Extdata Explanations"
+author: "Aubrey Odom"
+date: "2024-01-06"
+output: html_document
+---
+
+# Toy Data
+
+`inst/extdata/MAE.RDS`
+
+This file consists of a MultiAssayExperiment object with raw data published in the following paper:
+
+Odom-Mabey, Aubrey R., et al. "Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants." Gates Open Research 6.143 (2022): 143.
+
+The code to create the package data object is reproduced below.
+
+```{R, eval = FALSE}
+dat2 <- readRDS("/restricted/projectnb/infant-microbiome/work/aodom/HIV_Exposed_Infants/data/animalculesFinalHIV.rds")
+
+# Add in pairing data
+matched <- matrix(c("0554", "0469",
+                    "0620", "0507",
+                    "0645", "0539",
+                    "0749", "0718",
+                    "0798", "0801",
+                    "0850", "0839",
+                    "0895", "0878",
+                    "0915", "0890",
+                    "0987", "1040",
+                    "1095", "1049"),
+                  dimnames = list(c(), c("HIV", "Control")),
+                  byrow = TRUE, ncol = 2) %>%
+  tibble::as_tibble() %>%
+  dplyr::mutate(pairing = seq_len(nrow(.))) %>%
+  tidyr::pivot_longer(cols = c(HIV, Control), 
+                      names_to = c("HIVStatus"),
+                      values_to = "Subject") %>%
+  dplyr::mutate(Subject = paste(Subject, "-1", sep = "")) 
+
+# Merge with colData and extract SE objects
+se_mgx <- SummarizedExperiment::assay(dat2, "MicrobeGenetics") %>%
+  base::data.matrix() %>%
+  S4Vectors::SimpleList() %>% magrittr::set_names("MGX")
+se_colData <- SummarizedExperiment::colData(dat2[["MicrobeGenetics"]]) %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("rn") %>%
+  dplyr::left_join(matched, by = c("Subject", "HIVStatus")) %>%
+  as.data.frame() %>%
+  tibble::column_to_rownames("rn") %>%
+  S4Vectors::DataFrame()
+se_rowData <- SummarizedExperiment::rowData(dat2[["MicrobeGenetics"]])
+
+microbe_se <- SummarizedExperiment::SummarizedExperiment(
+  assays = se_mgx, colData = se_colData, rowData = se_rowData)
+MAE <- MultiAssayExperiment::MultiAssayExperiment(
+  experiments = S4Vectors::SimpleList(MicrobeGenetics = microbe_se),
+  colData = se_colData)
+
+stem2 <- "/restricted/projectnb/infant-microbiome/work/aodom/LMTK/inst/extdata"
+saveRDS(MAE, file.path(stem2, "MAE.RDS"))
+```
