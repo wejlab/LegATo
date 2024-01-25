@@ -14,7 +14,7 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 #' clean_animalcules_MAE(in_dat)
 #' 
 

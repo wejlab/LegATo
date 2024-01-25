@@ -18,7 +18,7 @@
     dplyr::select(.data$Subjects) %>% unlist()
   # Define n
   n <- input_data %>% dplyr::group_by(Populations) %>%
-    dplyr::distinct(Subjects) %>% dplyr::summarize(n_col = dplyr::n())
+    dplyr::distinct(Subjects) %>% dplyr::summarize("n_col" = dplyr::n())
   n1 <- n %>% dplyr::filter(Populations == Group1) %>%
     dplyr::select(`n_col`) %>% as.numeric()
   n2 <- n %>% dplyr::filter(Populations == Group2) %>%
@@ -64,7 +64,7 @@
   if(pval < 0.05) {
     ttest_unpaired <- function(tax) {
       for_testing <- input_data %>% dplyr::filter(.data$Taxon == tax)
-      out_test <- stats::t.test(formula("Abundance ~ Populations"), for_testing,
+      out_test <- stats::t.test(stats::formula("Abundance ~ Populations"), for_testing,
                          alternative = "two.sided",
                          var.equal = FALSE, paired = FALSE)
       return(list(t = out_test$statistic, df = out_test$parameter,

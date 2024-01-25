@@ -12,7 +12,7 @@ over time, including changes in composition or stability of commensal bacteria.
 LegATo integrates visualization, modeling and testing procedures. It is currently in development, but it will soon be supplemented by hierarchical clustering tools and multivariate generalized estimating equations (JGEEs) to adjust for the compositional nature of microbiome data. Other tools will be implemented as needed.
 
 # Documentation
-Documentation and tutorials for LegATo are available at our [website](https://github.com/aubreyodom/Legato).
+Documentation and tutorials for LegATo are available at our [website](https://aubreyodom.github.io/LegATo-docs/).
 
 
 # Installation
