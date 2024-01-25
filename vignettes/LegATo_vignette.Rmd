@@ -28,14 +28,14 @@ LegATo integrates visualization, modeling and testing procedures. It will be sup
 # Setup
 
 ```{R}
-library(LegATo)
+#library(LegATo)
 library(tidyverse)
 ```
 
 # Data
 We will be utilizing nasopharyngeal microbiome data from Zambian Infants from Odom et al.:
 
-```{R, eval = FALSE}
+```{R}
 dat <- readRDS("inst/extdata/MAE.RDS")
 
 # Fix this
@@ -46,7 +46,7 @@ parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
 parsed$sam
 ```
 
-```{R, eval = FALSE}
+```{R}
 alluvial_df <- get_long_data(dat_0.05, "genus")
 ```
 
@@ -91,19 +91,38 @@ plot_alluvial(dat = dat_0.05,
 
 
 ```{R}
-
-taxon_level <- "genus"
-time_var <- "timepoint"
-unit_var <-  "Subject"
-color_var <- "HIVStatus"
-plot_spaghetti(dat_0.05,
+plot_spaghetti(dat = dat_0.05,
+               covariate_time = "timepoint",
+               covariate_1 = "HIVStatus",
+               unit_var = "Subject",
                taxon_level = "genus",
-               time_var,
-               unit_var,
-               color_var,
                which_taxon = "Corynebacterium",
-               xlabel = "Infant Age (Days)",
-               ylabel = "Relative Abundance (log CPM)")
+               palette_input= this_palette,
+               title = "Spaghetti Plot",
+               subtitle = NULL) +
+  ggplot2::xlab("Infant Age (Days)") +
+  ggplot2::ylab("Relative Abundance (log CPM)")
+```
+
+## GEE Modeling
+```{R}
+run_gee_model(dat, unit_var = "Subject",
+              fixed_cov = c("HIVStatus", "MothChild", "Age"),
+              corstr = "ar1",
+              plot_out = FALSE,
+              plotsave_loc = ".",
+              plot_terms = NULL)
+
+# Trying out plotting
+run_gee_model(dat, unit_var = "Subject",
+              taxon_level = "genus",
+              fixed_cov = c("MothChild", "HIVStatus", "Age"),
+              corstr = "ar1",
+              plot_out = TRUE,
+              plotsave_loc = "/restricted/projectnb/infant-microbiome/work/aodom",
+              plot_terms = "MothChild",
+              width = 6, height = 4, units = "in", scale = 0.7)
+
 ```
 
 # Add hotelling

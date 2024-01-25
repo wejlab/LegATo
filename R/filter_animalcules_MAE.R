@@ -41,7 +41,7 @@ filter_animalcules_MAE <- function(dat, filter_pct = 0.05) {
     # Sum rel abu within samples/columns for genera
     dplyr::summarise(dplyr::across(.fns = sum, .cols = dplyr::everything())) %>%
     # Sum everything but the first columm ("genus")
-    dplyr::mutate("allmeans" = rowMeans(select(., -1))) %>%
+    dplyr::mutate("allmeans" = rowMeans(dplyr::select(., -1))) %>%
     dplyr::select("genus", "allmeans") %>%
     dplyr::mutate("genus" = replace(.data$genus, is.na(.data$genus), "Unknown")) %>%
     dplyr::arrange(dplyr::desc(.data$allmeans)) %>%

@@ -1,41 +1,58 @@
+#' Plot a spaghetti volatility plot of microbial abundance for a given taxon
+#'
+#' This function takes a \code{MultiAssayExperiment} object and returns a
+#' spaghetti plot of microbial abundance delineated by a unit, such as
+#' a subject.
+#'
+#' If further manipulation of specific parameters is desired, users can add
+#' \code{ggplot2} function calls to the output of the function.
+#'
+#' @inheritParams plot_stacked_bar
+#' @param covariate_1 Character string, the name of the covariate in `dat`
+#' by which to color and group samples. Default is \code{NULL}.
+#' @param unit_var Character string, the name of the column delineating the
+#' unit on which the microbial abundances are changing over time. This is
+#' likely something akin to a subject that repeated measurements are made on.
+#' @param which_taxon Character string, the name of the taxon to plot at the
+#' specified taxon level.
+#'
+#' @return A \code{ggplot2} plot.
+#'
+#' @export
+#' @importFrom rlang .data
+#'
+#' @examples
+#' print("My example here")
+#'
+
 plot_spaghetti <- function(dat,
-                           taxon_level,
                            covariate_time,
-                           covariate_1,
+                           covariate_1 = NULL,
                            unit_var,
+                           taxon_level,
                            which_taxon,
                            palette_input= NULL,
-                           title = paste("Relative abundance at", taxon_level, "level"),
+                           title = "Spaghetti Plot",
                            subtitle = NULL) {
-  relabu_table <- get_stacked_data(dat, taxon_level, covariate_1, covariate_time)
-  
-  taxa_ordered <- get_top_taxa(dat, taxon_level) %>%
-    dplyr::pull(.data$taxa)
-  
-  myplot <- relabu_table %>%
-    dplyr::mutate("Taxon" = factor(.data$taxon, levels = taxa_ordered),
-                  "Timepoint" = factor(covariate_t)) %>%
-    dplyr::rename("Relative abundance" = .data$value) %>%
-    ggplot2::ggplot(ggplot2::aes(fill = .data$Taxon, x = .data$Timepoint, y = .data$`Relative abundance`)) + 
-    ggplot2::geom_bar(position = "stack", stat = "identity") +
-    ggplot2::theme_classic() +
-    ggplot2::labs(title = title,
-                  subtitle = subtitle,
-                  ylabel = "Relative Abundance (log CPM)") +
-    ggplot2::theme(legend.position = "bottom",
-                   #axis.title.x = element_blank(), axis.text.x = element_blank(),
-                   axis.ticks.x = ggplot2::element_blank(),
-                   legend.title = ggplot2::element_blank()) +
-    ggplot2::coord_flip()
+  input_data <- get_long_data(dat, taxon_level, log = TRUE,
+                              counts_to_CPM = TRUE) %>%
+    dplyr::filter(taxon == which_taxon)
+  p <- input_data %>%
+    ggplot2::ggplot(ggplot2::aes(x = !!rlang::sym(covariate_time),
+                                 y = Abundance,
+                                 group = !!rlang::sym(unit_var),
+                                 color = !!rlang::sym(covariate_1))) +
+    ggplot2::geom_line(alpha = 0.7) +
+    ggplot2::geom_point(alpha = 0.7, size = 0.5) +
+    ggplot2::labs(title = "Spaghetti plot of microbe abundance",
+                  subtitle = which_taxon) +
+    ggplot2::theme_bw()
   
   if (!is.null(palette_input)) {
-    myplot <- myplot +
-      ggplot2::scale_fill_manual(values = palette_input)
+    p <- p + ggplot2::scale_color_manual(values = palette_input)
   }
-  if (!is.null(covariate_1)) {
-    myplot <- myplot +
-      ggplot2::facet_grid(~.data$covariate_1)
+  if(!is.null(covariate_1)) {
+    p <- p + ggplot2::facet_wrap(rlang::sym(covariate_1))
   }
-  
-  return(myplot)
+  return(p)
 }

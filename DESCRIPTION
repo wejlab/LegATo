@@ -4,6 +4,7 @@ Version: 0.0.0.9000
 Authors@R: c(
     person("Aubrey", "Odom", , "aodom@bu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7113-7598")),
+    person("Yilong", "Zhang", , "elong0527@gmail.com", role = c("ctb")),       
     person("Jared", "Pincus", , "pincus@bu.edu", role = "csl"),
     person("Jordan", "Pincus", , "pincus@bu.edu", role = "art")
   )
@@ -15,20 +16,22 @@ Depends:
 Imports:
     alluvial,
     animalcules,
+    broom,
+    data.table,
+    dplyr,
     emmeans,
     geepack,
+    ggalluvial,
     ggeffects,
+    ggplot2,
     lme4,
     magrittr,
     MultiAssayExperiment,
     rlang,
-    SummarizedExperiment,
     S4Vectors,
-    TBSignatureProfiler,
-    dplyr,
-    ggalluvial,
-    ggplot2,
     stringr,
+    SummarizedExperiment,
+    TBSignatureProfiler,
     tibble,
     tidyr,
     tidyselect

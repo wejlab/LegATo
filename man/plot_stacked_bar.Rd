@@ -27,7 +27,7 @@ aggregate the counts data. Must be the name of a column in
 plots. The default is \code{NULL}.}
 
 \item{covariate_time}{Character string giving the name of the discrete
-time-based covariate in the metadata to group the points on the bar chart.}
+time-based covariate in the metadata to group abundances by.}
 
 \item{palette_input}{A character vector of colors that is at minimum the same
 length of the number of taxa (specified with \code{taxon_level}).
