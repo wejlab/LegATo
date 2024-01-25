@@ -1,4 +1,4 @@
-# LegATo: Longitudinal mEtaGenomic Analysis Toolkit <img src="https://github.com/aubreyodom/Legato-docs/blob/main/legato-logo.png?raw=true" align="right" width="170" />
+# LegATo: Longitudinal mEtaGenomic Analysis Toolkit <img src="https://github.com/aubreyodom/Legato-docs/blob/main/legato-logo.jpg?raw=true" align="right" width="170" />
 
 ## What is LegATo?
 
