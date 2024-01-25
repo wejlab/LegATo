@@ -23,7 +23,7 @@ animalcules output.}
 \item{covariate_time}{Character string giving the name of the discrete
 time-based covariate in the metadata to group abundances by.}
 
-\item{covariate_1}{Character string, the name of the covariate in \code{dat}
+\item{covariate_1}{Character string, the name of the covariate in `dat`
 by which to color and group samples. Default is \code{NULL}.}
 
 \item{unit_var}{Character string, the name of the column delineating the
@@ -59,6 +59,10 @@ If further manipulation of specific parameters is desired, users can add
 \code{ggplot2} function calls to the output of the function.
 }
 \examples{
-print("My example here")
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+all_taxa <- get_top_taxa(in_dat, "phylum")
+plot_spaghetti(in_dat, taxon_level = "phylum", covariate_1 = "Group", covariate_time = "Month",
+              unit_var = "Subject", which_taxon = all_taxa$taxon[1],
+              palette_input = rainbow(25))
 
 }

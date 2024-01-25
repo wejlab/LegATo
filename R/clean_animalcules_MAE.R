@@ -14,7 +14,8 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' # example code
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' clean_animalcules_MAE(in_dat)
 #' 
 
 clean_animalcules_MAE <- function(dat) {
@@ -24,7 +25,7 @@ clean_animalcules_MAE <- function(dat) {
   counts_table <- parsed$counts
 
   se_rowData  <- tax_table %>%
-    dplyr::mutate("species" = stringr::str_remove_all(species, "\\[|\\]"))
+    dplyr::mutate("species" = stringr::str_remove_all(.data$species, "\\[|\\]"))
   
   # Replace species that are others with "sp."
   ind <- se_rowData$species == "others"

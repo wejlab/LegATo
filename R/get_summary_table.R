@@ -15,8 +15,11 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' print("My example here")
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' out <- get_summary_table(in_dat, c("Group", "Subject"))
+#' head(out)
 #'
+
 get_summary_table <- function(dat, group_vars) {
   microbe <- parse_MAE_SE(dat)
   counts_table <- microbe$counts

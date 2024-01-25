@@ -1,3 +1,12 @@
+#' Documentation
+#' 
+#' @export
+#' 
+#' @examples
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' get_stacked_data(in_dat, "genus", covariate_1 = "Sex", covariate_time = "Month")
+#'
+
 get_stacked_data <- function(dat, taxon_level = "genus",
                              covariate_1,
                              covariate_time) {

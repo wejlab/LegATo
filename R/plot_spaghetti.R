@@ -22,7 +22,11 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' print("My example here")
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' all_taxa <- get_top_taxa(in_dat, "phylum")
+#' plot_spaghetti(in_dat, taxon_level = "phylum", covariate_1 = "Group", covariate_time = "Month",
+#'               unit_var = "Subject", which_taxon = all_taxa$taxon[1],
+#'               palette_input = rainbow(25))
 #'
 
 plot_spaghetti <- function(dat,
@@ -36,10 +40,10 @@ plot_spaghetti <- function(dat,
                            subtitle = NULL) {
   input_data <- get_long_data(dat, taxon_level, log = TRUE,
                               counts_to_CPM = TRUE) %>%
-    dplyr::filter(taxon == which_taxon)
+    dplyr::filter(.data$taxon == which_taxon)
   p <- input_data %>%
     ggplot2::ggplot(ggplot2::aes(x = !!rlang::sym(covariate_time),
-                                 y = Abundance,
+                                 y = .data$Abundance,
                                  group = !!rlang::sym(unit_var),
                                  color = !!rlang::sym(covariate_1))) +
     ggplot2::geom_line(alpha = 0.7) +

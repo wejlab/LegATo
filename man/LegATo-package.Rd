@@ -13,6 +13,7 @@ Streamlining longitudinal microbiome profiling in Bioconductor.
 
 Other contributors:
 \itemize{
+  \item Yilong Zhang \email{elong0527@gmail.com} [contributor]
   \item Jared Pincus \email{pincus@bu.edu} [consultant]
   \item Jordan Pincus \email{pincus@bu.edu} [artist]
 }

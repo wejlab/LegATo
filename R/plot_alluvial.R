@@ -16,8 +16,10 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' print("My example here")
-#' 
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' plot_alluvial(in_dat, taxon_level = "family", covariate_1 = "Group", covariate_time = "Month",
+#'               palette_input = rainbow(25))
+#'
 
 plot_alluvial <- function(dat,
                           taxon_level,
@@ -29,7 +31,7 @@ plot_alluvial <- function(dat,
   relabu_table <- get_stacked_data(dat, taxon_level, covariate_1, covariate_time)
   
   taxa_ordered <- get_top_taxa(dat, taxon_level) %>%
-    dplyr::pull(taxa)
+    dplyr::pull(.data$taxon)
   
   myplot <- relabu_table %>%
     dplyr::mutate("Taxon" = factor(.data$taxon, levels = taxa_ordered),

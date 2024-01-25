@@ -30,7 +30,10 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' print("My example here")
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' plot_stacked_bar(in_dat, taxon_level = "family", covariate_1 = "Group",
+#'                   covariate_time = "Month",
+#'                   palette_input = rainbow(25))
 #'
 
 plot_stacked_bar <- function(dat,
@@ -43,11 +46,11 @@ plot_stacked_bar <- function(dat,
   relabu_table <- get_stacked_data(dat, taxon_level, covariate_1, covariate_time)
   
   taxa_ordered <- get_top_taxa(dat, taxon_level) %>%
-    dplyr::pull(.data$taxa)
+    dplyr::pull(.data$taxon)
   
   myplot <- relabu_table %>%
     dplyr::mutate("Taxon" = factor(.data$taxon, levels = taxa_ordered),
-                  "Timepoint" = factor(covariate_t)) %>%
+                  "Timepoint" = factor(.data$covariate_t)) %>%
     dplyr::rename("Relative abundance" = .data$value) %>%
     ggplot2::ggplot(ggplot2::aes(fill = .data$Taxon, x = .data$Timepoint, y = .data$`Relative abundance`)) + 
     ggplot2::geom_bar(position = "stack", stat = "identity") +

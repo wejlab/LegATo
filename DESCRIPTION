@@ -4,7 +4,7 @@ Version: 0.0.0.9000
 Authors@R: c(
     person("Aubrey", "Odom", , "aodom@bu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7113-7598")),
-    person("Yilong", "Zhang", , "elong0527@gmail.com", role = c("ctb")),       
+    person("Yilong", "Zhang", , "elong0527@gmail.com", role = "ctb"),
     person("Jared", "Pincus", , "pincus@bu.edu", role = "csl"),
     person("Jordan", "Pincus", , "pincus@bu.edu", role = "art")
   )
@@ -14,17 +14,11 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.3.0)
 Imports:
-    alluvial,
     animalcules,
-    broom,
     data.table,
     dplyr,
-    emmeans,
     geepack,
-    ggalluvial,
-    ggeffects,
     ggplot2,
-    lme4,
     magrittr,
     MultiAssayExperiment,
     rlang,
@@ -38,6 +32,9 @@ Imports:
 Suggests:
     BiocStyle,
     biomformat,
+    broom,
+    ggalluvial,
+    ggeffects,
     knitr,
     lintr,
     plyr,
@@ -48,7 +45,11 @@ Suggests:
     sys,
     testthat,
     usethis
+VignetteBuilder: 
+    knitr
+BiocType: Software
+biocViews: MicrobiomeData, ReproducibleResearch, SequencingData
 Encoding: UTF-8
 Language: en-US
-Roxygen: list(markdown = TRUE)
+LazyData: FALSE
 RoxygenNote: 7.2.3

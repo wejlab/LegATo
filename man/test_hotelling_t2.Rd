@@ -2,20 +2,103 @@
 % Please edit documentation in R/test_hotelling_t2.R
 \name{test_hotelling_t2}
 \alias{test_hotelling_t2}
-\title{run_Hotelling_mv_T2}
+\title{Conduct a multivariate Hotelling's T-squared test}
 \usage{
 test_hotelling_t2(
   dat,
-  test_index,
-  test_time,
+  test_index = NULL,
   taxon_level = "genus",
   num_taxa,
   grouping_var,
   paired = FALSE,
   pairing_var = NULL,
-  unique_id_var = NULL
+  unit_var = NULL,
+  save_table_loc = "."
 )
 }
+\arguments{
+\item{dat}{A MultiAssayExperiment object specially formatted as an animalcules output.}
+
+\item{test_index}{Any argument used for subsetting the input \code{dat},
+can be a character, logical, integer, list or List vector. Default is \code{NULL}.}
+
+\item{taxon_level}{Character string, default is \code{"genus"}.}
+
+\item{num_taxa}{The number of most abundant taxa to test. Needs to be small enough to
+avoid n > p issues where n is the smallest number of samples or units in a given group,
+and p is the number of microbes to be tested.}
+
+\item{grouping_var}{Character string, the name of a DICHOTOMOUS grouping variable in the
+metadata of \code{dat}.}
+
+\item{paired}{Logical indicating whether a paired test should be conducted.
+Default is \code{FALSE} for an unpaired test.}
+
+\item{pairing_var}{Character string giving the variable containing pairing information.
+The variable should be in integer form. Must be supplied if \code{paired = TRUE},
+otherwise the default is NULL.}
+
+\item{unit_var}{Character string giving the variable containing the identifiers
+for the unit on which multiple measurements were conducted, e.g. subjects. Default is
+\code{NULL}; must be supplied if \code{paired = FALSE}.}
+
+\item{save_table_loc}{A character string giving the folder path to save t.test results.
+Note that these are only conducted if the Hotelling's T-test value is <0.05. 
+Defaults to the current working directory.}
+}
+\value{
+A list of the elements "df1", "df2", "crit_F", "F_stat" and "pvalue" giving the
+results of the test.
+}
 \description{
-run_Hotelling_mv_T2
+This function takes an animalcules-formatted \code{MultiAssayExperiment}
+object and runs a multivariate Hotelling's T-squared test. The test expects
+a comparison of two distinct groups, and compares the abundances of the top microbes at a
+given taxon level between the groups. This function allows both paired and unpaired
+tests. Both test the null hypothesis that the population
+mean vectors are equal, with the alternative being that they are unequal.
+}
+\details{
+The Hotelling's t-squared statistic (t2) is a generalization of
+Student's t-statistic that is used in multivariate hypothesis testing
+to test the means of different populations.
+
+Note that any entries or pairs with missing values are excluded.
+
+Referenced articles in the implementation of tests:
+
+\link{https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.14}
+
+\link{https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.15}
+
+\link{https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.4}
+
+\link{https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.9}
+}
+\examples{
+dat <- system.file("extdata", "MAE.RDS", package = "LegATo") \%>\%
+readRDS()
+dat_0.05 <- filter_animalcules_MAE(dat, 0.05)
+out1 <- test_hotelling_t2(dat = dat_0.05,
+                  test_index = which(dat_0.05$MothChild == "Infant" &
+                                       dat_0.05$timepoint == 6),
+                  taxon_level = "genus",
+                  # To avoid n < p, use top 5-6 species
+                  num_taxa = 6,
+                  paired = TRUE,
+                  grouping_var = "HIVStatus",
+                  pairing_var = "pairing")
+out1                  
+
+out <- test_hotelling_t2(dat = dat_0.05,
+                  test_index = which(dat_0.05$MothChild == "Mother" &
+                                       dat_0.05$timepoint == 0),
+                  taxon_level = "genus",
+                  # To avoid n < p, use top 5-6 species
+                  num_taxa = 12,
+                  grouping_var = "HIVStatus",
+                  unit_var = "Subject",
+                  paired = FALSE)
+out                  
+
 }

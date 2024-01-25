@@ -52,6 +52,9 @@ If further manipulation of specific parameters is desired, users can add
 \code{ggplot2} function calls to the output of the function.
 }
 \examples{
-print("My example here")
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+plot_stacked_area(in_dat, taxon_level = "phylum", covariate_1 = "Group",
+                  covariate_time = "Month",
+                  palette_input = rainbow(25))
 
 }

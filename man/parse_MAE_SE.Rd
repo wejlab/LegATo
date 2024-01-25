@@ -18,9 +18,9 @@ to be specified if \code{type = "SE"}. Default is \code{NULL}.}
 denoting a \code{SummarizedExperiment}.}
 }
 \value{
-Returns a list of 3 named data.frame elements, \code{counts}, \code{sam}, and
-\code{tax} denoting the counts data, sample metadata table, and taxonomy table,
-respectively.
+Returns a list of 3 named data.frame elements, `counts`, `sam`, and
+  `tax` denoting the counts data, sample metadata table, and taxonomy table,
+  respectively.
 }
 \description{
 This function takes an animalcules-formatted \code{MultiAssayExperiment}
@@ -28,6 +28,13 @@ object and parses it to extract a named assay alongside the taxonomy and
 metadata.
 }
 \examples{
-# example code
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+out <- parse_MAE_SE(in_dat)
+head(out$tax)
+head(out$sam)
+head(out$counts)
+
+out2 <- parse_MAE_SE(in_dat[["MicrobeGenetics"]],
+                     which_assay = "MGX", type = "SE")
 
 }

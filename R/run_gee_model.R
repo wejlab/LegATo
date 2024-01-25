@@ -16,40 +16,51 @@ test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
                             plotsave_loc, plot_terms, ...) {
   filt_df <- input_df %>% 
     dplyr::mutate("unit_var" = as.factor(input_df[, unit_var])) %>%
-    dplyr::filter(taxon == tn) %>%
+    dplyr::filter(.data$taxon == tn) %>%
     dplyr::arrange(.data$unit_var)
   group_vars <- paste("Abundance ~", paste(fixed_cov, collapse = " + ")) %>%
-    formula()
+    stats::formula()
   complex <- geepack::geeglm(group_vars, id = unit_var, data = filt_df,
-                             na.action = na.omit, family = "gaussian",
+                             na.action = stats::na.omit, family = "gaussian",
                              corstr = corstr)
-  sum_comp <- summary(complex)
-  all_ci <- broom:::confint.geeglm(complex)
-  
+  sum_comp <- broom::tidy(complex, conf.int = TRUE)
+
   if (plot_out) {
     plyr::a_ply(fixed_cov, 1, mk_gee_plot, complex = complex, tn = tn,
                 plotsave_loc = plotsave_loc, plot_terms = plot_terms, ...)
   }
-  res_out <- sum_comp$coefficients %>%
-    dplyr::select("Estimate", "Pr(>|W|)") %>%
+  res_out <- sum_comp %>%
     dplyr::mutate("Taxon" = tn) %>%
-    dplyr::bind_cols(all_ci) %>%
-    dplyr::relocate("Taxon", "lwr", "Estimate", "upr") %>%
-    dplyr::rename("Coefficient Estimate" = .data$Estimate,
-                  "Lower 95% CI" = .data$lwr,
-                  "Upper 95% CI" = .data$upr) %>%
-    tibble::rownames_to_column(var = "Coefficient")
+    dplyr::rename("Coefficient" = "term",
+                  "Coefficient Estimate" = "estimate",
+                  "Lower 95% CI" = "conf.low",
+                  "Upper 95% CI" = "conf.high",
+                  "Standard Error" = "std.error",
+                  "Statistic" = "statistic",
+                  "Pr(>|W|)" = "p.value") %>%
+    as.data.frame()
   return(res_out)
 }
 
-#' Compute generalized estimating equations (gee)
+#' Compute Generalized Estimating Equations (GEEs)
 #' 
 #' Run an independent GEE model for each taxa with relative abundance
 #' Works well with small data - multiple subpoints/subjects across clusters
 #' 
+#' Source
 #' https://data.library.virginia.edu/getting-started-with-generalized-estimating-equations/
 #' 
 #' fixed_cov is a vector
+#' 
+#' @export
+#' @importFrom rlang .data
+#' 
+#' @examples
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' out <- run_gee_model(in_dat, taxon_level = "genus", unit_var = "Subject",
+#'                      fixed_cov = c("HairLength", "Age", "Group", "Sex"), corstr = "ar1")
+#' head(out)
+#' 
 
 run_gee_model <- function(dat,
                           taxon_level = "genus",
@@ -73,7 +84,7 @@ run_gee_model <- function(dat,
     data.table::rbindlist() %>%
     dplyr::arrange(.data$Coefficient) %>%
     dplyr::group_by(.data$Coefficient) %>%
-    dplyr::mutate("Adj p-value" = p.adjust(.data$`Pr(>|W|)`, method = "bonferroni")) %>%
+    dplyr::mutate("Adj p-value" = stats::p.adjust(.data$`Pr(>|W|)`, method = "bonferroni")) %>%
     dplyr::rename("Unadj p-value" = .data$`Pr(>|W|)`) %>%
     as.data.frame()
   return(storage)

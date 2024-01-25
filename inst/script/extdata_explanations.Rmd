@@ -60,3 +60,49 @@ MAE <- MultiAssayExperiment::MultiAssayExperiment(
 stem2 <- "/restricted/projectnb/infant-microbiome/work/aodom/LMTK/inst/extdata"
 saveRDS(MAE, file.path(stem2, "MAE.RDS"))
 ```
+
+This file is a small-form animalcules-formatted MAE object intended for usage with the examples.
+```{R, eval = FALSE}
+# Creating the sample data
+which_sex <- sample(c("Male", "Female"), 10, replace = TRUE)
+sample_table <- tibble(Sample = paste0("X-", seq_len(50)),
+                       Subject = rep(paste0("S", seq_len(10)), 5),
+                       Sex = rep(which_sex, 5),
+                       Month = rep(seq_len(5), each = 10),
+                       Group = rep(c("A", "B"), 25),
+                       Pairing = rep(rep(seq_len(5), each = 2), 5)) %>%
+  mutate("HairLength" = rnorm(50, mean = 50, sd = 14.5),
+         "Age" = runif(50, 21, 80)) %>%
+  as.data.frame()
+rownames(sample_table) <- sample_table$Sample
+
+# Tax table
+data_in_2 <- system.file("extdata/MAE.RDS", package = "LegATo") %>%
+  readRDS() %>% filter_animalcules_MAE(0.02)
+tax_dat_pre <- parse_MAE_SE(data_in_2)$tax
+ind <- sample(seq_len(nrow(tax_dat_pre)), 100)
+tax_dat <- tax_dat_pre[ind, ] %>%
+  arrange(species)
+
+# Counts table
+data_in <- system.file("extdata/MAE.rds", package = "animalcules") %>%
+  readRDS()
+counts_dat <- parse_MAE_SE(data_in)$counts
+colnames(counts_dat) <- sample_table$Sample
+rownames(counts_dat) <- rownames(tax_dat)
+
+se_mgx <- counts_dat %>% base::data.matrix() %>% S4Vectors::SimpleList() %>%
+  magrittr::set_names("MGX")
+se_rowData <- tax_dat %>% base::data.frame() %>%
+    dplyr::mutate_all(as.character) %>% S4Vectors::DataFrame()
+se_colData  <- sample_table %>% S4Vectors::DataFrame()
+
+microbe_se <- SummarizedExperiment::SummarizedExperiment(
+  assays = se_mgx, colData = se_colData, rowData = se_rowData)
+MAE_out <- MultiAssayExperiment::MultiAssayExperiment(
+  experiments = S4Vectors::SimpleList(MicrobeGenetics = microbe_se),
+  colData = se_colData)
+
+stem2 <- "/restricted/projectnb/infant-microbiome/work/aodom/LMTK/inst/extdata"
+saveRDS(MAE_out, file.path(stem2, "MAE_small.RDS"))
+```

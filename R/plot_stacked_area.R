@@ -16,8 +16,11 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' print("My example here")
-#' 
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' plot_stacked_area(in_dat, taxon_level = "phylum", covariate_1 = "Group",
+#'                   covariate_time = "Month",
+#'                   palette_input = rainbow(25))
+#'
 
 plot_stacked_area <- function(dat,
                               taxon_level,
@@ -31,7 +34,7 @@ plot_stacked_area <- function(dat,
                                    covariate_1, covariate_time)
   
   taxa_ordered <- get_top_taxa(dat, taxon_level) %>%
-    dplyr::pull(taxa)
+    dplyr::pull(.data$taxon)
   
   p <- relabu_table %>%
     dplyr::mutate("Taxon" = factor(.data$taxon, levels = taxa_ordered),

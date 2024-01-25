@@ -21,7 +21,14 @@
 #' @import MultiAssayExperiment
 #'
 #' @examples
-#' # example code
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' out <- parse_MAE_SE(in_dat)
+#' head(out$tax)
+#' head(out$sam)
+#' head(out$counts)
+#' 
+#' out2 <- parse_MAE_SE(in_dat[["MicrobeGenetics"]],
+#'                      which_assay = "MGX", type = "SE")
 #' 
 
 parse_MAE_SE <- function(dat, which_assay = NULL, type = "MAE") {
@@ -29,7 +36,7 @@ parse_MAE_SE <- function(dat, which_assay = NULL, type = "MAE") {
     if (is.null(which_assay)) {
       which_assay <- names(MultiAssayExperiment::assays(dat))[1]
     }
-    if (class(dat) != "MultiAssayExperiment") {
+    if (!is(dat, "MultiAssayExperiment")) {
       stop("Input must be a MultiAssayExperiment")
     }
     microbe <- dat[[which_assay]]

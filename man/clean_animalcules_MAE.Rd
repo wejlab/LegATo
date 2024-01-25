@@ -12,7 +12,7 @@ animalcules output.}
 }
 \value{
 An animalcules-formatted \code{MultiAssayExperiment} object with
-cleaned-up taxonomy nomenclature.
+  cleaned-up taxonomy nomenclature.
 }
 \description{
 This functional is an optional method for fixing up taxon names in a
@@ -21,6 +21,7 @@ Specifically it removes brackets from species names, replaces species labeled
 as "others" with "sp." and finally replaces underscores with spaces.
 }
 \examples{
-# example code
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+clean_animalcules_MAE(in_dat)
 
 }

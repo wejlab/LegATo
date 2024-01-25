@@ -14,14 +14,16 @@
 #'   will include a normalized CPM assay. If \code{log = TRUE} as well, then a
 #'   log CPM assay will also be created. Default is \code{TRUE}.
 #'
-#' @return A \code{data.frame} consisting of the counts data, taxons, and
+#' @return A \code{data.frame} consisting of the counts data, taxa, and
 #'   metadata.
 #'
 #' @export
 #' @importFrom rlang .data
 #'
 #' @examples
-#' print("My example here")
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' out <- get_long_data(in_dat, "genus", log = TRUE, counts_to_CPM = TRUE)
+#' head(out)
 #' 
 
 get_long_data <- function(dat, taxon_level, log = FALSE,

@@ -19,7 +19,8 @@ utils::globalVariables(".")
 #' @importFrom rlang .data
 #'
 #' @examples
-#' # example code
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' filter_animalcules_MAE(in_dat, 0.01)
 #' 
 
 filter_animalcules_MAE <- function(dat, filter_pct = 0.05) {

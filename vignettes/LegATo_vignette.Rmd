@@ -28,18 +28,16 @@ LegATo integrates visualization, modeling and testing procedures. It will be sup
 # Setup
 
 ```{R}
-#library(LegATo)
-library(tidyverse)
+library(LegATo)
 ```
 
 # Data
 We will be utilizing nasopharyngeal microbiome data from Zambian Infants from Odom et al.:
 
 ```{R}
-dat <- readRDS("inst/extdata/MAE.RDS")
+dat <- system.file("extdata", "MAE.RDS", package = "LegATo") |>
+  readRDS()
 
-# Fix this
-#dat_0.05 <- clean_animalcules_MAE(dat) %>% filter_animalcules_MAE(0.05)
 dat_0.05 <- filter_animalcules_MAE(dat, 0.05)
 
 parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
@@ -62,8 +60,7 @@ best_species <- get_top_taxa(dat_0.05, "species")
 ```
 
 ```{R}
-this_palette <- paletteer::palettes_d[["ggsci"]]["category20_d3"] |>
-    unlist() |> unname()
+this_palette <- rainbow(20)
 
 plot_stacked_area(dat_0.05, "genus", 
                          "HIVStatus",
@@ -114,42 +111,40 @@ run_gee_model(dat, unit_var = "Subject",
               plot_terms = NULL)
 
 # Trying out plotting
-run_gee_model(dat, unit_var = "Subject",
-              taxon_level = "genus",
-              fixed_cov = c("MothChild", "HIVStatus", "Age"),
-              corstr = "ar1",
-              plot_out = TRUE,
-              plotsave_loc = "/restricted/projectnb/infant-microbiome/work/aodom",
-              plot_terms = "MothChild",
-              width = 6, height = 4, units = "in", scale = 0.7)
-
+#run_gee_model(dat, unit_var = "Subject",
+#              taxon_level = "genus",
+#              fixed_cov = c("MothChild", "HIVStatus", "Age"),
+#              corstr = "ar1",
+#              plot_out = TRUE,
+#              plotsave_loc = #"/restricted/projectnb/infant-microbiome/work/aodom",
+#              plot_terms = "MothChild",
+#              width = 6, height = 4, units = "in", scale = 0.7)
+#
 ```
 
 # Add hotelling
 
-```{R, eval = FALSE}
+```{R}
 test_hotelling_t2(dat = dat_0.05,
-                    test_time = 6,
-                    test_index = which(dat_0.05$MothChild == "Infant" &
-                                         dat_0.05$timepoint == 6),
-                    taxon_level = "genus",
-                    # To avoid n < p, use top 5-6 species
-                    num_taxa = 6,
-                    paired = TRUE,
-                    grouping_var = "HIVStatus",
-                    pairing_var = "pairing")
+                  test_index = which(dat_0.05$MothChild == "Infant" &
+                                       dat_0.05$timepoint == 6),
+                  taxon_level = "genus",
+                  # To avoid n < p, use top 5-6 species
+                  num_taxa = 6,
+                  paired = TRUE,
+                  grouping_var = "HIVStatus",
+                  pairing_var = "pairing")
 
 test_hotelling_t2(dat = dat_0.05,
-                    test_time = 0,
-                    test_index = which(dat_0.05$MothChild == "Mother" &
-                                        dat_0.05$timepoint == 0),
-                    taxon_level = "genus",
-                    # To avoid n < p, use top 5-6 species
-                    num_taxa = 12,
-                    grouping_var = "HIVStatus",
-                    unique_id_var = "Subject",
-                    paired = FALSE)
-    
+                  test_index = which(dat_0.05$MothChild == "Mother" &
+                                      dat_0.05$timepoint == 0),
+                  taxon_level = "genus",
+                  # To avoid n < p, use top 5-6 species
+                  num_taxa = 12,
+                  grouping_var = "HIVStatus",
+                  unit_var = "Subject",
+                  paired = FALSE)
+  
 ```
 
 
