@@ -36,7 +36,7 @@ parse_MAE_SE <- function(dat, which_assay = NULL, type = "MAE") {
     if (is.null(which_assay)) {
       which_assay <- names(MultiAssayExperiment::assays(dat))[1]
     }
-    if (!is(dat, "MultiAssayExperiment")) {
+    if (!methods::is(dat, "MultiAssayExperiment")) {
       stop("Input must be a MultiAssayExperiment")
     }
     microbe <- dat[[which_assay]]

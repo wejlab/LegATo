@@ -58,13 +58,13 @@
   # Reject H0 at alpha if F-val exceeds
   df1 <- p
   df2 <- n1 + n2 - p - 1
-  crit_F <- qf(0.95, df1, df2)
-  pval <- 1 - pf(c(F_stat), df1, df2)
+  crit_F <- stats::qf(0.95, df1, df2)
+  pval <- 1 - stats::pf(c(F_stat), df1, df2)
   
   if(pval < 0.05) {
     ttest_unpaired <- function(tax) {
       for_testing <- input_data %>% dplyr::filter(.data$Taxon == tax)
-      out_test <- t.test(formula("Abundance ~ Populations"), for_testing,
+      out_test <- stats::t.test(formula("Abundance ~ Populations"), for_testing,
                          alternative = "two.sided",
                          var.equal = FALSE, paired = FALSE)
       return(list(t = out_test$statistic, df = out_test$parameter,
@@ -75,11 +75,11 @@
     }
     results <- sapply(unique(input_data$Taxon), ttest_unpaired)
     results <- rbind(results,
-                     "adj p-value" = p.adjust(results["p-value", ],
+                     "adj p-value" = stats::p.adjust(results["p-value", ],
                                               method = "bonferroni"))
     # Write results
     filename_out <- paste0("ttest_results", Group1, Group2, ".csv")
-    write.csv(results, file.path(save_table_loc, filename_out))
+    utils::write.csv(results, file.path(save_table_loc, filename_out))
     message("Results from t-tests written to", filename_out)
   }
   
@@ -133,15 +133,15 @@
   # Reject H0 at alpha if F-val exceeds
   df1 <- p
   df2 <- n - p
-  crit_F <- qf(0.95, df1, df2)
-  pval <- 1 - pf(c(F_stat), df1, df2)
+  crit_F <- stats::qf(0.95, df1, df2)
+  pval <- 1 - stats::pf(c(F_stat), df1, df2)
   
   # Conduct a paired t-test
   # Following # 1 in R&C pg. 140
   if(pval < 0.05) {
     ttest_paired <- function(tax) {
       for_testing <- input_data %>% dplyr::filter(.data$Taxon == tax)
-      out_test <- t.test(x = for_testing$Group1,
+      out_test <- stats::t.test(x = for_testing$Group1,
                          y = for_testing$Group2,
                          alternative = "two.sided",
                          paired = TRUE, var.equal = TRUE)
@@ -154,11 +154,11 @@
       return(lapply(output, base::round, digits = 4))
     }
     results <- sapply(unique(input_data$Taxon), ttest_paired)
-    results <- rbind(results, "adj p-value" = p.adjust(results["p-value", ],
+    results <- rbind(results, "adj p-value" = stats::p.adjust(results["p-value", ],
                                                        method = "bonferroni"))
     # Write results
     filename_out <- paste0("ttest_results", Group1, Group2, ".csv")
-    write.csv(results, file.path(save_table_loc, filename_out))
+    utils::write.csv(results, file.path(save_table_loc, filename_out))
     message("Results from t-tests written to", filename_out)
   }
   

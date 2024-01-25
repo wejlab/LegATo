@@ -44,7 +44,8 @@ Suggests:
     spelling,
     sys,
     testthat,
-    usethis
+    usethis,
+    methods
 VignetteBuilder: 
     knitr
 BiocType: Software

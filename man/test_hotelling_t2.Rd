@@ -67,13 +67,13 @@ Note that any entries or pairs with missing values are excluded.
 
 Referenced articles in the implementation of tests:
 
-\link{https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.14}
+https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.14
 
-\link{https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.15}
+https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.15
 
-\link{https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.4}
+https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.4
 
-\link{https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.9}
+https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.9
 }
 \examples{
 dat <- system.file("extdata", "MAE.RDS", package = "LegATo") \%>\%
