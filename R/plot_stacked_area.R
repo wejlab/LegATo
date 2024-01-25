@@ -16,7 +16,7 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 #' plot_stacked_area(in_dat, taxon_level = "phylum", covariate_1 = "Group",
 #'                   covariate_time = "Month",
 #'                   palette_input = rainbow(25))

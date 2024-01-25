@@ -15,7 +15,7 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 #' out <- get_summary_table(in_dat, c("Group", "Subject"))
 #' head(out)
 #'

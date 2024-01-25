@@ -42,23 +42,44 @@ test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
   return(res_out)
 }
 
-#' Compute Generalized Estimating Equations (GEEs)
-#' 
-#' Run an independent GEE model for each taxa with relative abundance
-#' Works well with small data - multiple subpoints/subjects across clusters
-#' 
-#' Source
-#' https://data.library.virginia.edu/getting-started-with-generalized-estimating-equations/
-#' 
-#' fixed_cov is a vector
-#' 
+#' Compute Generalized Estimating Equations (GEEs) on longitudinal microbiome
+#' data
+#'
+#' This function takes an animalcules-formatted \code{MultiAssayExperiment} and
+#' runs an independent GEE model for each taxon. The model predicts taxon log
+#' CPM abundance as a product of fixed-effects covariates conditional on a
+#' grouping ID variable, usually the unit on which repeated measurements were
+#' taken. This modeling approach works best with small datasets that multiple
+#' samples across many (>40) clusters/units.
+#'
+#' P-values are adjusted for the model coefficients within each taxon. The
+#' following methods are permitted: \code{c("holm", "hochberg", "hommel",
+#' "bonferroni", "BH", "BY", "fdr", "none")}
+#'
+#' @inheritParams test_hotelling_t2
+#' @param fixed_cov A character vector naming covariates to be tested.
+#' @param corstr A character string specifying the correlation structure. The
+#'   following are permitted: '"independence"', '"exchangeable"', '"ar1"',
+#'   '"unstructured"'.
+#' @param p_adj_method A character string specifying the correction method. Can
+#'   be abbreviated. See details. Default is \code{"fdr"}.
+#' @param plot_out Logical indicating whether plots should be output alongside
+#'   the model results. Default is \code{FALSE}.
+#' @param plotsave_loc A character string giving the folder path to save plot
+#'   outputs. This defaults to the current working directory.
+#' @param plot_terms Character vector. Which terms should be examined in the
+#'   plot output? Can overlap with the \code{fixed_cov} inputs.
+#' @param ... Further arguments passed to \code{ggsave} for plot creation.
+#'
 #' @export
 #' @importFrom rlang .data
-#' 
+#'
 #' @examples
-#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |>
+#'               readRDS()
 #' out <- run_gee_model(in_dat, taxon_level = "genus", unit_var = "Subject",
-#'                      fixed_cov = c("HairLength", "Age", "Group", "Sex"), corstr = "ar1")
+#'                      fixed_cov = c("HairLength", "Age", "Group", "Sex"),
+#'                      corstr = "ar1")
 #' head(out)
 #' 
 
@@ -67,6 +88,7 @@ run_gee_model <- function(dat,
                           unit_var,
                           fixed_cov,
                           corstr = "ar1",
+                          p_adj_method = "fdr",
                           plot_out = FALSE,
                           plotsave_loc = ".",
                           plot_terms = NULL,
@@ -84,7 +106,7 @@ run_gee_model <- function(dat,
     data.table::rbindlist() %>%
     dplyr::arrange(.data$Coefficient) %>%
     dplyr::group_by(.data$Coefficient) %>%
-    dplyr::mutate("Adj p-value" = stats::p.adjust(.data$`Pr(>|W|)`, method = "bonferroni")) %>%
+    dplyr::mutate("Adj p-value" = stats::p.adjust(.data$`Pr(>|W|)`, method = p_adj_method)) %>%
     dplyr::rename("Unadj p-value" = .data$`Pr(>|W|)`) %>%
     as.data.frame()
   return(storage)

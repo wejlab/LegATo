@@ -1,9 +1,19 @@
-#' Documentation
+#' Create a long data.frame with grouped abundances from a MultiAssayExperiment counts object
 #' 
+#' This function takes a \code{MultiAssayExperiment} object and a specified
+#' taxon level of interest and creates a long \code{data.frame} that can be used
+#' more easily for plotting counts data in a stacked bar plot or a stacked area
+#' chart. The function groups taxa and computes relative abundance within taxa strata.
+#' 
+#' @inheritParams plot_spaghetti
+#' 
+#' @return A \code{data.frame} consisting of the counts data, taxa, and metadata.
+#'
 #' @export
+#' @importFrom rlang .data
 #' 
 #' @examples
-#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 #' get_stacked_data(in_dat, "genus", covariate_1 = "Sex", covariate_time = "Month")
 #'
 

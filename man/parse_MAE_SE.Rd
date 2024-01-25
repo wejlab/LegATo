@@ -28,7 +28,7 @@ object and parses it to extract a named assay alongside the taxonomy and
 metadata.
 }
 \examples{
-in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 out <- parse_MAE_SE(in_dat)
 head(out$tax)
 head(out$sam)

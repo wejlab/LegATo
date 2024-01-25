@@ -41,7 +41,6 @@ dat <- system.file("extdata", "MAE.RDS", package = "LegATo") |>
 dat_0.05 <- filter_animalcules_MAE(dat, 0.05)
 
 parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
-parsed$sam
 ```
 
 ```{R}
@@ -103,12 +102,14 @@ plot_spaghetti(dat = dat_0.05,
 
 ## GEE Modeling
 ```{R}
-run_gee_model(dat, unit_var = "Subject",
-              fixed_cov = c("HIVStatus", "MothChild", "Age"),
-              corstr = "ar1",
-              plot_out = FALSE,
-              plotsave_loc = ".",
-              plot_terms = NULL)
+output <- run_gee_model(dat, unit_var = "Subject",
+                        fixed_cov = c("HIVStatus", "MothChild", "Age"),
+                        corstr = "ar1",
+                        plot_out = FALSE,
+                        plotsave_loc = ".",
+                        plot_terms = NULL)
+
+head(output)
 
 # Trying out plotting
 #run_gee_model(dat, unit_var = "Subject",

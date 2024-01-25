@@ -23,7 +23,7 @@ data.frame of the present taxa at a user-supplied taxonomy level,
 and outputs the average abundances of the taxa.
 }
 \examples{
-in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 out <- get_top_taxa(in_dat, "genus")
 out
 

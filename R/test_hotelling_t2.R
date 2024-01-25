@@ -20,9 +20,9 @@
   n <- input_data %>% dplyr::group_by(Populations) %>%
     dplyr::distinct(Subjects) %>% dplyr::summarize("n_col" = dplyr::n())
   n1 <- n %>% dplyr::filter(Populations == Group1) %>%
-    dplyr::select(`n_col`) %>% as.numeric()
+    dplyr::select("n_col") %>% as.numeric()
   n2 <- n %>% dplyr::filter(Populations == Group2) %>%
-    dplyr::select(`n_col`) %>% as.numeric()
+    dplyr::select("n_col") %>% as.numeric()
   p <- length(unique(input_data$Taxon))
   # Sample mean vector
   X_i <- input_data %>%
@@ -219,7 +219,7 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' dat <- system.file("extdata", "MAE.RDS", package = "LegATo") %>%
+#' dat <- system.file("extdata", "MAE.RDS", package = "LegATo") |>
 #' readRDS()
 #' dat_0.05 <- filter_animalcules_MAE(dat, 0.05)
 #' out1 <- test_hotelling_t2(dat = dat_0.05,

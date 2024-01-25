@@ -1,0 +1,47 @@
+url: https://aubreyodom.github.io/LegATo-docs/
+
+template:
+  bootstrap: 5
+  bootswatch: sandstone
+
+navbar:
+  bg: primary
+  title: "LegATo"
+  left: 
+    - text: "Home"
+      href: index.html
+    - text: "Tutorials"
+      menu:
+        - text: "Command Line Analysis"
+        - href: articles/LegATo_vignette.html
+    - text: "Function Reference"
+      href: reference/index.html
+    - text: "Package News"
+      href: news/index.html
+  right:
+    - icon: fa-github
+      href: https://github.com/aubreyodom/legato
+
+home:
+  links:
+  - text: W. Evan Johnson Lab
+    href: https://www.wejlab.org/
+  - text: Browse source code
+    href: https://github.com/aubreyodom/LegATo
+  - text: Report a bug
+    href: https://github.com/aubreyodom/LegATo/issues
+  sidebar:
+    structure: [links, license, citation, authors, dev]
+
+authors:
+  footer:
+    roles: [cre]
+    text: "Site created by"
+  sidebar:
+    roles: [aut, ctb, csl, art]
+    after: "Thanks all!"
+
+footer:
+  structure: 
+    left: pkgdown
+    right: [authors]

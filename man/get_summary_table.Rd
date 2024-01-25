@@ -23,7 +23,7 @@ This function takes a \code{MultiAssayExperiment} of microbial read counts
 and aggregates them by one or more grouping vars within a unit.
 }
 \examples{
-in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 out <- get_summary_table(in_dat, c("Group", "Subject"))
 head(out)
 

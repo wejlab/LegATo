@@ -25,7 +25,7 @@ After identification at the genus level, taxa across the genus and species
 levels are then consolidated into the category "Other".
 }
 \examples{
-in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 filter_animalcules_MAE(in_dat, 0.01)
 
 }

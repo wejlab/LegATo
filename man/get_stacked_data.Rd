@@ -2,15 +2,35 @@
 % Please edit documentation in R/get_stacked_data.R
 \name{get_stacked_data}
 \alias{get_stacked_data}
-\title{Documentation}
+\title{Create a long data.frame with grouped abundances from a MultiAssayExperiment counts object}
 \usage{
 get_stacked_data(dat, taxon_level = "genus", covariate_1, covariate_time)
 }
+\arguments{
+\item{dat}{A \code{MultiAssayExperiment} object specially formatted as an
+animalcules output.}
+
+\item{taxon_level}{Character string indicating the level of taxonomy to
+aggregate the counts data. Must be the name of a column in
+\code{MultiAssayExperiment::rowData(dat)}.}
+
+\item{covariate_1}{Character string, the name of the covariate in `dat`
+by which to color and group samples. Default is \code{NULL}.}
+
+\item{covariate_time}{Character string giving the name of the discrete
+time-based covariate in the metadata to group abundances by.}
+}
+\value{
+A \code{data.frame} consisting of the counts data, taxa, and metadata.
+}
 \description{
-Documentation
+This function takes a \code{MultiAssayExperiment} object and a specified
+taxon level of interest and creates a long \code{data.frame} that can be used
+more easily for plotting counts data in a stacked bar plot or a stacked area
+chart. The function groups taxa and computes relative abundance within taxa strata.
 }
 \examples{
-in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 get_stacked_data(in_dat, "genus", covariate_1 = "Sex", covariate_time = "Month")
 
 }

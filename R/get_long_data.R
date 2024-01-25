@@ -2,7 +2,7 @@
 #'
 #' This function takes a \code{MultiAssayExperiment} object and a specified
 #' taxon level of interest and creates a long \code{data.frame} that can be used
-#' more easily for plotting counts.
+#' more easily for plotting counts data.
 #'
 #' @inheritParams plot_stacked_bar
 #' @param log logical. Indicate whether an assay returned should be the log of
@@ -21,7 +21,7 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") %>% readRDS()
+#' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 #' out <- get_long_data(in_dat, "genus", log = TRUE, counts_to_CPM = TRUE)
 #' head(out)
 #' 

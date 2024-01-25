@@ -14,7 +14,7 @@ Streamlining longitudinal microbiome profiling in Bioconductor.
 Other contributors:
 \itemize{
   \item Yilong Zhang \email{elong0527@gmail.com} [contributor]
-  \item Jared Pincus \email{pincus@bu.edu} [consultant]
+  \item Jared Pincus \email{pincus@bu.edu} (\href{https://orcid.org/0000-0001-6708-5262}{ORCID}) [consultant]
   \item Jordan Pincus \email{pincus@bu.edu} [artist]
 }
 

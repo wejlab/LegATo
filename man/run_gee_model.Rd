@@ -2,7 +2,8 @@
 % Please edit documentation in R/run_gee_model.R
 \name{run_gee_model}
 \alias{run_gee_model}
-\title{Compute Generalized Estimating Equations (GEEs)}
+\title{Compute Generalized Estimating Equations (GEEs) on longitudinal microbiome
+data}
 \usage{
 run_gee_model(
   dat,
@@ -10,26 +11,61 @@ run_gee_model(
   unit_var,
   fixed_cov,
   corstr = "ar1",
+  p_adj_method = "fdr",
   plot_out = FALSE,
   plotsave_loc = ".",
   plot_terms = NULL,
   ...
 )
 }
+\arguments{
+\item{dat}{A MultiAssayExperiment object specially formatted as an animalcules output.}
+
+\item{taxon_level}{Character string, default is \code{"genus"}.}
+
+\item{unit_var}{Character string giving the variable containing the identifiers
+for the unit on which multiple measurements were conducted, e.g. subjects. Default is
+\code{NULL}; must be supplied if \code{paired = FALSE}.}
+
+\item{fixed_cov}{A character vector naming covariates to be tested.}
+
+\item{corstr}{A character string specifying the correlation structure. The
+following are permitted: '"independence"', '"exchangeable"', '"ar1"',
+'"unstructured"'.}
+
+\item{p_adj_method}{A character string specifying the correction method. Can
+be abbreviated. See details. Default is \code{"fdr"}.}
+
+\item{plot_out}{Logical indicating whether plots should be output alongside
+the model results. Default is \code{FALSE}.}
+
+\item{plotsave_loc}{A character string giving the folder path to save plot
+outputs. This defaults to the current working directory.}
+
+\item{plot_terms}{Character vector. Which terms should be examined in the
+plot output? Can overlap with the \code{fixed_cov} inputs.}
+
+\item{...}{Further arguments passed to \code{ggsave} for plot creation.}
+}
 \description{
-Run an independent GEE model for each taxa with relative abundance
-Works well with small data - multiple subpoints/subjects across clusters
+This function takes an animalcules-formatted \code{MultiAssayExperiment} and
+runs an independent GEE model for each taxon. The model predicts taxon log
+CPM abundance as a product of fixed-effects covariates conditional on a
+grouping ID variable, usually the unit on which repeated measurements were
+taken. This modeling approach works best with small datasets that multiple
+samples across many (>40) clusters/units.
 }
 \details{
-Source
-https://data.library.virginia.edu/getting-started-with-generalized-estimating-equations/
-
-fixed_cov is a vector
+P-values are adjusted for the model coefficients within each taxon. The
+following methods are permitted: \code{c("holm", "hochberg", "hommel",
+"bonferroni", "BH", "BY", "fdr", "none")}
 }
 \examples{
-in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |>
+              readRDS()
 out <- run_gee_model(in_dat, taxon_level = "genus", unit_var = "Subject",
-                     fixed_cov = c("HairLength", "Age", "Group", "Sex"), corstr = "ar1")
+                     fixed_cov = c("HairLength", "Age", "Group", "Sex"),
+                     corstr = "ar1")
 head(out)
 
 }

@@ -59,7 +59,7 @@ If further manipulation of specific parameters is desired, users can add
 \code{ggplot2} function calls to the output of the function.
 }
 \examples{
-in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") \%>\% readRDS()
+in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 all_taxa <- get_top_taxa(in_dat, "phylum")
 plot_spaghetti(in_dat, taxon_level = "phylum", covariate_1 = "Group", covariate_time = "Month",
               unit_var = "Subject", which_taxon = all_taxa$taxon[1],

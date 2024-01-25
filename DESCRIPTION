@@ -1,15 +1,15 @@
 Package: LegATo
 Title: LegATo: Longitudinal mEtaGenomic Analysis Toolkit
-Version: 0.0.0.9000
+Version: 0.99.0
 Authors@R: c(
     person("Aubrey", "Odom", , "aodom@bu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7113-7598")),
     person("Yilong", "Zhang", , "elong0527@gmail.com", role = "ctb"),
-    person("Jared", "Pincus", , "pincus@bu.edu", role = "csl"),
+    person("Jared", "Pincus", , "pincus@bu.edu", role = "csl",
+           comment = c(ORCID = "0000-0001-6708-5262")),
     person("Jordan", "Pincus", , "pincus@bu.edu", role = "art")
   )
-Description: Streamlining longitudinal microbiome profiling in
-    Bioconductor.
+Description: Streamlining longitudinal microbiome profiling in Bioconductor.
 License: MIT + file LICENSE
 Depends:
     R (>= 4.3.0)
