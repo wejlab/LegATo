@@ -32,7 +32,8 @@ clean_animalcules_MAE <- function(dat) {
   se_rowData$species[ind] <- paste(se_rowData$genus[ind], "sp.", sep = " ")
   # Replace genus that are others with species information
   ind <- se_rowData$genus == "others" & !is.na(se_rowData$genus)
-  all_split <- sapply(strsplit(se_rowData$species, " "), function(x) x[[1]])
+  all_split <- plyr::aaply(strsplit(se_rowData$species, " "), 1,
+                           function(x) x[[1]])
   se_rowData$genus[ind] <- all_split[ind]
   
   #ISSUE: DUplicates because we need to consolidate down to species level

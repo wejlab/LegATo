@@ -27,7 +27,7 @@
 #' 
 
 get_long_data <- function(dat, taxon_level, log = FALSE,
-                        counts_to_CPM = FALSE) {
+                          counts_to_CPM = FALSE) {
   SE_obj <- dat[["MicrobeGenetics"]]
   assay_name <- names(SummarizedExperiment::assays(SE_obj))[1]
   if (log | counts_to_CPM) {
@@ -35,9 +35,9 @@ get_long_data <- function(dat, taxon_level, log = FALSE,
                                            input_name = assay_name,
                                            output_name = "assay",
                                            log = log, counts_to_CPM = counts_to_CPM)
-    if (log) which_assay = "log_assay"
-    if (counts_to_CPM) which_assay = "assay_CPM"
-    if (log && counts_to_CPM) which_assay = "log_assay_CPM"
+    if (log) which_assay <- "log_assay"
+    if (counts_to_CPM) which_assay <- "assay_CPM"
+    if (log && counts_to_CPM) which_assay <- "log_assay_CPM"
   }
   
   microbe <- parse_MAE_SE(SE_obj, which_assay = which_assay, type = "SE")

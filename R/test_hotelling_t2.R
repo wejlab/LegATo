@@ -73,7 +73,7 @@
                   CI_97.5 = out_test$conf.int[2],
                   "p-value" = out_test$p.value))
     }
-    results <- sapply(unique(input_data$Taxon), ttest_unpaired)
+    results <- plyr::aaply(unique(input_data$Taxon), 1, ttest_unpaired)
     results <- rbind(results,
                      "adj p-value" = stats::p.adjust(results["p-value", ],
                                               method = "bonferroni"))
@@ -153,7 +153,7 @@
                      "p-value" = as.numeric(out_test$p.value))
       return(lapply(output, base::round, digits = 4))
     }
-    results <- sapply(unique(input_data$Taxon), ttest_paired)
+    results <- plyr::aaply(unique(input_data$Taxon), 1, ttest_paired)
     results <- rbind(results, "adj p-value" = stats::p.adjust(results["p-value", ],
                                                        method = "bonferroni"))
     # Write results

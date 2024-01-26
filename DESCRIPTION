@@ -4,12 +4,15 @@ Version: 0.99.0
 Authors@R: c(
     person("Aubrey", "Odom", , "aodom@bu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7113-7598")),
-    person("Yilong", "Zhang", , "elong0527@gmail.com", role = "ctb"),
+    person("Yilong", "Zhang", , "elong0527@gmail.com", role = "ctb",
+           comment = "Author of NMIT functions"),
     person("Jared", "Pincus", , "pincus@bu.edu", role = "csl",
-           comment = c(ORCID = "0000-0001-6708-5262")),
-    person("Jordan", "Pincus", , "pincus@bu.edu", role = "art")
+           comment = c(ORCID = "0000-0001-6708-5262", other = "Naming consultant of package")),
+    person("Jordan", "Pincus", , "pincus@bu.edu", role = "art",
+           comment = "Artist of LegATo icon")
   )
-Description: Streamlining longitudinal microbiome profiling in Bioconductor.
+Description: LegATo is a suite of open-source software tools for streamlining longitudinal microbiome analysis, 
+    integrating visualization, modeling and testing procedures.
 License: MIT + file LICENSE
 Depends:
     R (>= 4.3.0)
@@ -33,10 +36,14 @@ Suggests:
     BiocStyle,
     biomformat,
     broom,
+    emmeans,
     ggalluvial,
     ggeffects,
+    gplots,
+    grDevices,
     knitr,
     lintr,
+    methods,
     plyr,
     R.utils,
     rmarkdown,
@@ -45,7 +52,7 @@ Suggests:
     sys,
     testthat,
     usethis,
-    methods
+    vegan
 VignetteBuilder: 
     knitr
 BiocType: Software

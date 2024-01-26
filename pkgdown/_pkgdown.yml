@@ -4,6 +4,36 @@ template:
   bootstrap: 5
   bootswatch: sandstone
 
+reference:
+  - title: "Plot and Visualize Longitudinal Microbial Data"
+    desc: ~
+    contents:
+    - plot_alluvial
+    - plot_spaghetti
+    - plot_stacked_area
+    - plot_stacked_bar
+  - title: "Analyze Longitudinal Microbial Data"
+    desc: "Conduct Hotelling's T-squared tests, NMIT, and model data."
+    contents:  
+    - run_gee_model
+    - test_hotelling_t2
+    - NMIT
+    - tscor
+  - title: "Manipulate Raw MAE Objects"
+    desc: "Create, clean, and filter a MultiAssayExperiment object."
+    contents:
+    - create_formatted_MAE
+    - clean_animalcules_MAE
+    - filter_animalcules_MAE
+  - title: "Reformat a MAE Objects into a Data Frame"
+    desc: "Take a animalcules-formatted MAE and reformat for visualizationa and analysis."
+    contents:
+    - parse_MAE_SE
+    - get_long_data
+    - get_stacked_data
+    - get_summary_table
+    - get_top_taxa
+
 navbar:
   bg: primary
   title: "LegATo"
@@ -13,7 +43,7 @@ navbar:
     - text: "Tutorials"
       menu:
         - text: "Command Line Analysis"
-        - href: articles/LegATo_vignette.html
+          href: articles/LegATo_vignette.html
     - text: "Function Reference"
       href: reference/index.html
     - text: "Package News"
@@ -40,8 +70,3 @@ authors:
   sidebar:
     roles: [aut, ctb, csl, art]
     after: "Thanks all!"
-
-footer:
-  structure: 
-    left: pkgdown
-    right: [authors]

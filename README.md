@@ -12,9 +12,7 @@ over time, including changes in composition or stability of commensal bacteria.
 LegATo integrates visualization, modeling and testing procedures. It is currently in development, but it will soon be supplemented by hierarchical clustering tools and multivariate generalized estimating equations (JGEEs) to adjust for the compositional nature of microbiome data.
 
 ### The Story Behind the Name
-In music, legato indicates that notes are played or sung smoothly and connected, without a noticeable break between them. The LegATo package facilitates a cohesive and interconnected understanding of the microbial communities represented by the samples, much like the smooth connection of musical notes in a legato passage. 
-
-Therefore, LegATo metaphorically represents the smooth and connected analysis of longitudinal metagenomic data, drawing inspiration from the musical term to convey a sense of continuity and harmony in the modeling process.
+In music, legato indicates that notes are played or sung smoothly and connected over time, without a noticeable break between them. The LegATo package facilitates a cohesive and interconnected understanding of the microbial communities represented by sequencing samples longitudinally, much like the smooth connection of musical notes in a legato passage. 
 
 ## Documentation
 Documentation and tutorials for LegATo are available at our [website](https://aubreyodom.github.io/LegATo-docs/).

@@ -74,6 +74,7 @@ test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
 #' @export
 #' @importFrom rlang .data
 #'
+#' @returns A \code{data.frame} of modeling results.
 #' @examples
 #' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |>
 #'               readRDS()
@@ -102,7 +103,7 @@ run_gee_model <- function(dat,
                          corstr = corstr,
                          plot_out = plot_out,
                          plotsave_loc = plotsave_loc,
-                         plot_terms = plot_terms) %>%
+                         plot_terms = plot_terms, ...) %>%
     data.table::rbindlist() %>%
     dplyr::arrange(.data$Coefficient) %>%
     dplyr::group_by(.data$Coefficient) %>%

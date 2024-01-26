@@ -6,16 +6,16 @@
 \alias{LegATo-package}
 \title{LegATo: LegATo: Longitudinal mEtaGenomic Analysis Toolkit}
 \description{
-Streamlining longitudinal microbiome profiling in Bioconductor.
+LegATo is a suite of open-source software tools for streamlining longitudinal microbiome analysis, integrating visualization, modeling and testing procedures.
 }
 \author{
 \strong{Maintainer}: Aubrey Odom \email{aodom@bu.edu} (\href{https://orcid.org/0000-0001-7113-7598}{ORCID})
 
 Other contributors:
 \itemize{
-  \item Yilong Zhang \email{elong0527@gmail.com} [contributor]
-  \item Jared Pincus \email{pincus@bu.edu} (\href{https://orcid.org/0000-0001-6708-5262}{ORCID}) [consultant]
-  \item Jordan Pincus \email{pincus@bu.edu} [artist]
+  \item Yilong Zhang \email{elong0527@gmail.com} (Author of NMIT functions) [contributor]
+  \item Jared Pincus \email{pincus@bu.edu} (\href{https://orcid.org/0000-0001-6708-5262}{ORCID}) (Naming consultant of package) [consultant]
+  \item Jordan Pincus \email{pincus@bu.edu} (Artist of LegATo icon) [artist]
 }
 
 }

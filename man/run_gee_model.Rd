@@ -47,6 +47,9 @@ plot output? Can overlap with the \code{fixed_cov} inputs.}
 
 \item{...}{Further arguments passed to \code{ggsave} for plot creation.}
 }
+\value{
+A \code{data.frame} of modeling results.
+}
 \description{
 This function takes an animalcules-formatted \code{MultiAssayExperiment} and
 runs an independent GEE model for each taxon. The model predicts taxon log

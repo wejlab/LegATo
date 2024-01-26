@@ -102,7 +102,7 @@ plot_spaghetti(dat = dat_0.05,
 
 ## GEE Modeling
 ```{R}
-output <- run_gee_model(dat, unit_var = "Subject",
+output <- run_gee_model(dat_0.05, unit_var = "Subject",
                         fixed_cov = c("HIVStatus", "MothChild", "Age"),
                         corstr = "ar1",
                         plot_out = FALSE,
@@ -112,15 +112,15 @@ output <- run_gee_model(dat, unit_var = "Subject",
 head(output)
 
 # Trying out plotting
-#run_gee_model(dat, unit_var = "Subject",
-#              taxon_level = "genus",
-#              fixed_cov = c("MothChild", "HIVStatus", "Age"),
-#              corstr = "ar1",
-#              plot_out = TRUE,
-#              plotsave_loc = #"/restricted/projectnb/infant-microbiome/work/aodom",
-#              plot_terms = "MothChild",
-#              width = 6, height = 4, units = "in", scale = 0.7)
-#
+run_gee_model(dat_0.05, unit_var = "Subject",
+              taxon_level = "genus",
+              fixed_cov = c("MothChild", "HIVStatus", "Age"),
+              corstr = "ar1",
+              plot_out = TRUE,
+              plotsave_loc = "/restricted/projectnb/infant-microbiome/work/aodom",
+              plot_terms = "MothChild",
+              width = 6, height = 4, units = "in", scale = 0.7)
+
 ```
 
 # Add hotelling
