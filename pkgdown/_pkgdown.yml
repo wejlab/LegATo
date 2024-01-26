@@ -25,7 +25,7 @@ reference:
     - create_formatted_MAE
     - clean_animalcules_MAE
     - filter_animalcules_MAE
-  - title: "Reformat a MAE Objects into a Data Frame"
+  - title: "Reformat a MAE Object into a Data Frame"
     desc: "Take a animalcules-formatted MAE and reformat for visualizationa and analysis."
     contents:
     - parse_MAE_SE

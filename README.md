@@ -1,6 +1,6 @@
 
 # LegATo
-### A Longitudinal mEtaGenomic Analysis Toolkit <img src="https://github.com/aubreyodom/Legato-docs/blob/main/legato-logo.jpg?raw=true" align="right" width="140">
+### A Longitudinal mEtaGenomic Analysis Toolkit <img src="https://github.com/wejlab/Legato-docs/blob/main/legato-logo.jpg?raw=true" align="right" width="140">
 
 LegATo is a suite of open-source software tools for longitudinal microbiome analysis. It is extendable to
 several different study forms with optimal ease-of-use for researchers. Microbiome time-series data
@@ -15,9 +15,9 @@ LegATo integrates visualization, modeling and testing procedures. It is currentl
 In music, legato indicates that notes are played or sung smoothly and connected over time, without a noticeable break between them. The LegATo package facilitates a cohesive and interconnected understanding of the microbial communities represented by sequencing samples longitudinally, much like the smooth connection of musical notes in a legato passage. 
 
 ## Documentation
-Documentation and tutorials for LegATo are available at our [website](https://aubreyodom.github.io/LegATo-docs/).
+Documentation and tutorials for LegATo are available at our [website](https://wejlab.github.io/LegATo-docs/).
 
-Check out a thorough tutorial on proper usage of our package [here](https://aubreyodom.github.io/LegATo-docs/articles/LegATo_vignette.html).
+Check out a thorough tutorial on proper usage of our package [here](https://wejlab.github.io/LegATo-docs/articles/LegATo_vignette.html).
 
 ## Installation
 LegATo requires R Version 4.3.
@@ -27,5 +27,5 @@ Install the development version of the package from Github:
 ```
 if (!requireNamespace("devtools", quietly=TRUE))
   install.packages("devtools")
-devtools::install_github("aubreyodom/LegATo")
+devtools::install_github("wejlab/LegATo")
 ```

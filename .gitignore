@@ -36,4 +36,4 @@ rsconnect/
 .Rproj.user
 # pkgdown
 Legato-docs/
-Legato-docs
+*.Rproj
