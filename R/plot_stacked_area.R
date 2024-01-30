@@ -43,7 +43,7 @@ plot_stacked_area <- function(dat,
     ggplot2::ggplot(ggplot2::aes(x = .data$`Time point`,
                                  y = .data$`Relative abundance`,
                                  fill = .data$`Taxon`)) + 
-    ggplot2::geom_area(alpha = 0.7, linewidth = .5, colour = "white") +
+    ggplot2::geom_area(alpha = 0.7, linewidth = .2, colour = "white") +
     ggplot2::theme_classic() +
     ggplot2::labs(x = "Time point", y = "Relative abundance",
                   title = title,

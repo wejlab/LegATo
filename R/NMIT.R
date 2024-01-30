@@ -63,44 +63,58 @@ tscor <- function(dat, unit_var, method = "kendall", fill_na = 0) {
 }
 
 #' Nonparametric Microbial Interdependence Test (NMIT)
-#' 
-#' The package performs a multivariate distance-based test for group comparisons of
-#' microbial temporal interdependence. The NMIT test provides a comprehensive way to evaluate
-#' the association between key phenotypic variables and microbial interdependence.
-#' This function is recommended for use after a filtering step using \code{filter_animalcules_MAE}.
+#'
+#' An R-based implementation of the NMIT, a multivariate distance-based test for
+#' group comparisons of microbial temporal interdependence. The NMIT test
+#' provides a comprehensive way to evaluate the association between key
+#' phenotypic variables and microbial interdependence. This function is
+#' recommended for use after a filtering step using
+#' \code{filter_animalcules_MAE}.
 #'
 #' @author Yilong Zhang, Huilin Li, Aubrey Odom
 #'
 #' @inheritParams tscor
 #' @inheritParams plot_stacked_bar
-#' @param fixed_cov A character vector of covariates of interest found in dat.
-#' @param dist_type A character strin specifying the type of matrix norm to be computed. The default is \code{"F"}. 
+#' @param fixed_cov A character vector of covariates of interest found in
+#'   \code{dat}.
+#' @param dist_type A character string specifying the type of matrix norm to be
+#'   computed. The default is \code{"F"}.
 #' \itemize{
-#'     \item{\code{"M"} or \code{"m"}}{specifies the maximum modulus of all the elements in \code{x}.}
-#'     \item{\code{"O"}, \code{"o"} or \code{"1"}}{specifies the one norm, (maximum absolute column sum);}
-#'     \item{\code{"I"} or \code{"i"}}{specifies the infinity norm (maximum absolute row sum);}
-#'     \item{\code{"F"} or \code{"f"}}{specifies the Frobenius norm (the Euclidean norm of \code{x} treated as if it were a vector); and}
+#'     \item{\code{"M"} or \code{"m"}}{specifies the maximum modulus of all the
+#'     elements in \code{x}.}
+#'     \item{\code{"O"}, \code{"o"} or \code{"1"}}{specifies the one norm,
+#'     (maximum absolute column sum);}
+#'     \item{\code{"I"} or \code{"i"}}{specifies the infinity norm (maximum
+#'     absolute row sum);}
+#'     \item{\code{"F"} or \code{"f"}}{specifies the Frobenius norm (the
+#'     Euclidean norm of \code{x} treated as if it were a vector)}
 #' }  
-#' @param heatmap A logical value indicating whether to draw heatmap. The default is \code{TRUE}.
-#' @param classify A logical value indicating whether to draw a classifier tree. The default is \code{FALSE}.
-#' @param fill_na A number between 0 and 1 to fill \code{NA} values. The default value is 0.
+#' @param heatmap A logical value indicating whether to draw heatmap. The
+#'   default is \code{TRUE}.
+#' @param classify A logical value indicating whether to draw a classifier tree.
+#'   The default is \code{FALSE}.
+#' @param fill_na A number between 0 and 1 to fill \code{NA} values. The default
+#'   value is 0.
+#' @param ... Additional arguments to be passed to \code{ComplexHeatmap::Heatmap()}.
 #'
-#' @return This function returns an analysis of variance (ANOVA) table showing sources of variation,
-#' degrees of freedom, sequential sums of squares, mean squares, F statistics, partial R-squared and P values,
-#' based on 999 permutations.
-#' 
+#' @return This function returns an analysis of variance (ANOVA) table showing
+#'   sources of variation, degrees of freedom, sequential sums of squares, mean
+#'   squares, F statistics, partial R-squared and P values, based on 999
+#'   permutations.
+#'
 #' @export
 #' 
 #' @examples
 #' dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 #' NMIT(dat, unit_var = "Subject", fixed_cov = "Group", covariate_time = "Month")
-#'
+#' 
 
 NMIT <- function(dat, unit_var, fixed_cov,
                  covariate_time,
                  method = "kendall", dist_type = "F",
                  heatmap = TRUE, classify = FALSE,
-                 fill_na = 0) {
+                 fill_na = 0,
+                 ...) {
   dat <- .rearrange_sub_time(dat, unit_var, covariate_time) 
   all_dat <- parse_MAE_SE(dat)
   map <- all_dat$sam
@@ -119,17 +133,37 @@ NMIT <- function(dat, unit_var, fixed_cov,
                 })
   rownames(dist) <- dimnames(otu.cor)[[3]]
   colnames(dist) <- dimnames(otu.cor)[[3]]
-  grp <- map.unique[rownames(dist) , fixed_cov]
+  grp <- map.unique[rownames(dist), fixed_cov]
   test <- vegan::adonis2(dist ~ grp)
   if(heatmap){
-    #pvalue <- paste(round(c(test$F[1], test$`Pr(>F)`[1]), 3),
-    #                collapse = ";")
     pvalue <- round(c(test$`Pr(>F)`[1]), 3)
     n.taxa <- nrow(otu)
+    
     diag(dist) <- stats::median(dist)
-    plot_title <- paste0(" #OTU:", n.taxa, " pvalue:", pvalue)
-    stats::heatmap(sqrt(dist), Colv = classify, Rowv = classify, scale = "column", 
-            xlab = unit_var, ylab = unit_var,
-            main = paste("NMIT Correlation Heatmap across", n.taxa, "taxa with p-value", pvalue))
+    mat <- as.matrix(sqrt(dist))
+    
+    plot_title <- paste0(" # OTU: ", n.taxa, " pvalue: ", pvalue)
+    cov_mat <- grp %>% as.matrix %>%
+      magrittr::set_rownames(rownames(dist)) %>%
+      magrittr::set_colnames(fixed_cov) %>%
+      as.data.frame
+    plot_heatmap(
+      inputData = mat,
+      annotationData = cov_mat,
+      name = "NMIT Correlation",
+      plot_title = plot_title,
+      signatureColNames = NULL,
+      annotationColNames = NULL,
+      colList = list(),
+      scale = FALSE,
+      showColumnNames = TRUE,
+      showRowNames = TRUE,
+      colorSets = c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Accent", "Dark2",
+                    "Paired"),
+      choose_color = c("blue", "gray95", "red"),
+      split_heatmap = "none",
+      column_order = NULL,
+      ...
+    )
   }
 }

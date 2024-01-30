@@ -1,0 +1,23 @@
+---
+title: "Hotelling's T-squared tests"
+author: 
+- name: Aubrey R. Odom
+  affiliation: 
+  - Program in Bioinformatics, Boston University, Boston, MA
+  email: aodom@bu.edu
+date: '`r format(Sys.Date(), "%B %e, %Y")`'
+package: LegATo
+output: 
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Hotelling's T-squared tests}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+# Hotelling's T-Squared Tests
+
+Coming soon.
+

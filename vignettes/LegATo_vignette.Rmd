@@ -1,5 +1,5 @@
 ---
-title: "Introduction to LegATo"
+title: "LegATo Tutorial"
 author: 
 - name: Aubrey R. Odom
   affiliation: 
@@ -10,74 +10,232 @@ package: LegATo
 output: 
   BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{Introdution to MetaScope}
+  %\VignetteIndexEntry{LegATo Tutorial}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
 ---
 
-# Introduction to LegATo: Longitudinal mEtaGenomic Analysis TOolkit
+# Introduction to LegATo
 
 ## Streamlining longitudinal microbiome profiling in Bioconductor
 
-LegATo is a suite of open-source software tools for longitudinal microbiome analysis that is extendable to several different study forms with optimal ease-of-use for researchers. Microbiome time-series data presents distinct challenges including complex covariate dependencies and variety of longitudinal study designs. This toolkit will allow researchers to determine which microbial taxa are affected over time by perturbations such as onset of disease or lifestyle choices, and to predict the effects of these perturbations over time, including changes in composition or stability of commensal bacteria. 
+Microbiome time-series data presents several distinct challenges, including complex covariate dependencies and a variety of longitudinal study designs. Furthermore, while several individual tools have been created to aid in longitudinal microbiome data analysis, an all-inclusive R-based toolkit has remained elusive. 
 
-LegATo integrates visualization, modeling and testing procedures. It will be supplemented by hierarchical clustering tools and multivariate generalized estimating equations (JGEEs) to adjust for the compositional nature of microbiome data.
+To address these concerns, LegATo (Longitudinal mEtaGenomic Analysis TOolkit) has risen from the ashes. LegATo is a suite of open-source software tools for longitudinal microbiome analysis that is extendable to several different study forms, all while promising optimal ease-of-use for researchers.  This toolkit will allow researchers to determine which microbial taxa are affected over time by perturbations such as onset of disease or lifestyle choices, and to predict the effects of these perturbations over time, including changes in composition or stability of commensal bacteria.
 
-# Setup
+Currently, LegATo entertains a number of data cleaning, aggregation, modeling and testing procedures. As we develop or learn of new methods, we will add to the toolkit accordingly. We will soon add hierarchical clustering tools and multivariate generalized estimating equations (JGEEs) to adjust for the compositional nature of microbiome data.
 
+# Getting started with LegATo
+
+## Compatibility with `MultiAssayExperiment` and `SummarizedExperiment` objects
+
+The convenience of LegATo is in part credited to the integration of `MultiAssayExperiment` and `SummarizedExperiment` objects. These are reliable and clean data structures developed by the \emph{Bioconductor team} as part of the `r Biocpkg("MultiAssayExperiment")` and `r Biocpkg("SummarizedExperiment")` packages.
+
+The `MultiAssayExperiment` container concisely stores a `SummarizedExperiment` object, which aggregates data matrices along with annotation information, metadata, and reduced dimensionality data (PCA, t-SNE, etc.). To learn more about proper usage and context of these objects, you may want to take a look at the [MultiAssayExperiment package vignette](https://bioconductor.org/packages/release/bioc/vignettes/MultiAssayExperiment/inst/doc/MultiAssayExperiment.html) and [SummarizedExperiment package vignette](https://bioconductor.org/packages/release/bioc/vignettes/SummarizedExperiment/inst/doc/SummarizedExperiment.html).
+
+To install these two packages, run the following code:
+```{r MAE_SE_install, eval = FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("SummarizedExperiment")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("SummarizedExperiment")
+```
+
+## Installation and setup
+
+In order to install the development version of LegATo from Github, run the following code:
+
+```{r load_LegATo, eval = FALSE}
+if (!requireNamespace("devtools", quietly=TRUE))
+  install.packages("devtools")
+devtools::install_github("wejlab/LegATo")
+```
+
+Now we'll load the LegATo package into our library:
 ```{R}
 library(LegATo)
 ```
 
-# Data
-We will be utilizing nasopharyngeal microbiome data from Zambian Infants from Odom et al.:
+# Formatting input data for use with LegATo
+
+LegATo functions expect data that is properly formatted in a `MultiAssayExperiment` container that is compatible with the [animalcules package](https://wejlab.github.io/animalcules-docs/). Obtaining properly formatted data can be achieved easily via the `create_formatted_MAE()` function from the LegATo package, as detailed below.
+
+## A note on compatibility with other packages
+
+If you've analyzed your metagenomic or 16S data via the [MetaScope package](https://wejlab.github.io/metascope-docs/), you can aggregate your sample outputs with user-input metadata using the `convert_animalcules()` or `convert_animalcules_silva()` functions. These functions create a taxonomy table and collate all data into a LegATo- and animalcules-compatible `MultiAssayExperiment` object.
+
+You can also format your data analyzed elsewhere (like PathoScope 2.0) with the [animalcules package](https://wejlab.github.io/animalcules-docs/) in the upload step with the R Shiny app, and then select "Download Animalcules File" to obtain a `MAE` object that can be used with LegATo.
+
+## Requirements for using `create_formatted_MAE()`
+
+For the purposes of this example, we'll look at some example inputs unrelated to the main HIV-E infant data:
+```{R}
+counts <- system.file("extdata", "counts.csv", package = "LegATo") |>
+  read.csv(row.names = 1) |>
+  dplyr::rename_with(function(x) stringr::str_replace(x, "\\.", "-"))
+tax <- system.file("extdata", "tax.csv", package = "LegATo") |> read.csv(row.names = 1)
+sample <- system.file("extdata", "sample.csv", package = "LegATo") |> read.csv(row.names = 1)
+```
+
+Now we'll look at the formatting of each:
+```{R}
+ndim <- 5
+counts[seq_len(ndim), seq_len(ndim)] |>
+  knitr::kable(caption = "Counts Table Preview",
+               label = NA)
+
+tax[seq_len(ndim), ] |>
+  knitr::kable(caption = "Taxonomy Table Preview",
+               label = NA)
+
+sample[seq_len(ndim), ] |>
+  knitr::kable(caption = "Sample Table Preview",
+               label = NA)
+```
+
+You should note the following:
+
+* The `counts` table is composed of raw microbial counts. There is one row for each taxon, and one column for each sample.
+* The `tax` table is composed of taxonomy lineages. There is one row for each taxon, and any number of columns each taxonomic level (e.g., superkingdom, genus, species). The lowest level of taxonomy serves as the rownames for the table, and is also stored in its own column. Taxonomic levels increase in granularity from left to right.
+* The `sample` table contains entries for each sample, with unique sample IDs on the rows. The columns are metadata for the samples, such as subjects or units on which repeated measures were taken, groupings, pairings, and covariates.
+* `rownames(counts) == rownames(tax)`
+* `colnames(counts) == colnames(sample)`
+
+## Use `create_formatted_MAE()`
+
+So once your data are formatted correctly, you can pretty easily use `create_formatted_MAE()` like so:
+```{R}
+output <- create_formatted_MAE(counts_dat = counts,
+                               tax_dat = tax,
+                               metadata_dat = sample)
+
+class(output)
+MultiAssayExperiment::assays(output)
+SummarizedExperiment::assays(output[["MicrobeGenetics"]])
+```
+
+## Adding information to your metadata later in your analysis
+
+If information needs to be added to your data object at some point in the analysis, it is easiest to manipulate the raw data objects (potentially via `parse_MAE_SE()`) and then recreate the `MAE` object with `create_formatted_MAE()`.
+
+# Example data
+
+To illustrate the capabilities of LegATo, we will turn to a published dataset from the following paper:
+
+Odom-Mabey AR, Gill CJ, Pieciak R et al. Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants [version 1; peer review: 1 approved with reservations]. Gates Open Res 2022, 6:143 (https://doi.org/10.12688/gatesopenres.14041.1)
+
+The raw dataset is archived in Zenodo:
+
+Zenodo: Underlying data for ‘Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants’. https://doi.org/10.5281/zenodo.725531324
+
+Further details on how the dataset was altered for inclusion in this package are provided [here](https://github.com/wejlab/LegATo/blob/main/inst/script/extdata_explanations.Rmd).
+
+### Example data context and structure
+
+The example data consists of 167 NP swabs of healthy HIV-exposed, uninfected (HEU; n=10) infants and their HIV(+) mothers and HIV-unexposed, uninfected (HUU; n=10) infants and their HIV(-) mothers. A total of 7 samples were collected per infant, with some missingness in the data. These swabs were identified from a sample library collected in Lusaka, Zambia between 2015 and 2016. 
+
+The analysis objective is to parse the association between the NP resident bacteria and infant HIV exposure during the first 3.5 months (14 weeks) of life, a critical time in microbiome maturation.
+
+All data was processed with `PathoScope 2.0`, and the sample outputs were aggregated with the `animalcules` R package.
+
+For this analysis, we will work with the infant data only and subset the data accordingly.
 
 ```{R}
 dat <- system.file("extdata", "MAE.RDS", package = "LegATo") |>
   readRDS()
 
-dat_0.05 <- filter_animalcules_MAE(dat, 0.05)
-
-parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
+dat_subsetted <- MultiAssayExperiment::subsetByColData(dat,
+                                                       dat$MothChild == "Infant")
 ```
+
+This leaves us with `r dim(parse_MAE_SE(dat_subsetted)$sam)[1]` samples in our analysis.
+
+# Initial data exploration
+
+## MAE manipulation
+
+`LegATo` has several functions for manipulating `MAE` objects, delineated below:
+
+### Clean up animalcules-formatted MAEs
+
+If your data were aggregated via the `animalcules` package, as was done for the example data, the samples were aggregated at the strain taxonomic level and have residual taxonomy IDs present. The `clean_animalcules_MAE()` function cleans up data suffering from these issues.
 
 ```{R}
-alluvial_df <- get_long_data(dat_0.05, "genus")
+dat_cleaned <- clean_animalcules_MAE(dat_subsetted)
 ```
 
+### Filter MAE
+
+Many metagenomic pipelines identify taxon abundances at extremely small levels, which can be noisy to deal with in an analysis. The `filter_animalcules_MAE` function smoothly transforms reads belonging to taxa with an overall genera threshold under the `filter_prop` (filter proportion) argument, which we will set as 0.005.
+
+```{R}
+dat_filt <- filter_animalcules_MAE(dat_cleaned, 0.005)
+```
+
+### Parse MAE to extract data
+
+If you want to take a closer look at your data, you can easily extract it into the counts, taxonomy, and sample metadata tables using the `parse_MAE_SE()` function.
+
+```{R}
+parsed <- parse_MAE_SE(dat_filt, which_assay = "MicrobeGenetics", type = "MAE")
+
+parsed$counts[seq_len(5), seq_len(5)] |> 
+  knitr::kable(caption = "Counts Table")
+
+parsed$sam[seq_len(5), ]  |>
+  knitr::kable(caption = "Sample Metadata")
+
+parsed$tax[seq_len(5), ] |> 
+  knitr::kable(caption = "Taxonomy Table")
+
+```
+
+### Summarizing microbial counts data
+
+It is fairly convenient to summarize the average number of reads for a report with `get_summary_table()`. The table groups by user-provided discrete covariates.
 ```{R}
 group_vars <- c("HIVStatus", "MothChild")
-get_summary_table(dat_0.05, group_vars)
+get_summary_table(dat_filt, group_vars) |>
+  knitr::kable(caption = "Summary Table", label = NA)
 ```
 
-
+The `get_top_taxa` function outputs a `data.frame` that lists taxa in order of relative abundance.
 ```{R}
-best_genus <- get_top_taxa(dat_0.05, "genus")
-best_species <- get_top_taxa(dat_0.05, "species")
+best_genus <- get_top_taxa(dat_filt, "genus")
+best_genus |> knitr::kable(caption = "Table of genera, ranked by abundance")
 ```
 
-```{R}
-this_palette <- rainbow(20)
+### Other data manipulation functions
 
-plot_stacked_area(dat_0.05, "genus", 
-                         "HIVStatus",
-                         "timepoint",
-                         palette_input = this_palette)
+If you want to conduct your own analyses, the `get_long_data()` function will prove convenient. The `get_stacked_data()` function can be used for certain visualizations that utilize a relative abundance aggregation approach.
+
+```{R}
+longdat <- get_long_data(dat_filt, "genus", log = TRUE, counts_to_CPM = TRUE)
+
+stackeddat <- get_stacked_data(dat_filt, "genus", covariate_1 = "HIVStatus",
+                               covariate_time = "timepoint")
 ```
 
-```{R}
+## Visualizing Data
 
-plot_stacked_bar(dat_0.05, "genus", 
-             "HIVStatus",
-             "timepoint",
-             palette_input = this_palette)
+There are several plots by which we can visualize changes in relative abundance over time, accounting for a given covariate. In this case, we are interested in HIV exposure.
+
+We'll select a palette using `paletteer`.
+```{R}
+this_palette <- paletteer::palettes_d$ggsci$springfield_simpsons |>
+  magrittr::extract(seq_len(nrow(best_genus)))
 ```
 
-```{R}
+### Alluvial plot
 
-plot_alluvial(dat = dat_0.05, 
+Alluvial diagrams illustrate individual taxa as stream fields that change position at different time points. The height of a stream field represents the relative abundance of that taxon. At a given time point, stream fields are ranked from the highest to lowest abundance (top to bottom). These can be constructed with `plot_alluvial()`.
+```{R}
+plot_alluvial(dat = dat_filt, 
               taxon_level = "genus", 
               covariate_1 = "HIVStatus",
               covariate_time = "timepoint",
@@ -85,14 +243,17 @@ plot_alluvial(dat = dat_0.05,
               subtitle = "Alluvial plot")
 ```
 
+### Spaghetti plot
 
-```{R}
-plot_spaghetti(dat = dat_0.05,
+We can create spaghetti or volatility plots to elucidate changes over time on a sample level for a given taxon. This is advantageous as other visualization methods are often aggregates of multiple samples and lack granularity. These plots can be created with `plot_spaghetti()`.
+
+```{R, results = "asis", message = FALSE}
+  p <- plot_spaghetti(dat = dat_filt,
                covariate_time = "timepoint",
                covariate_1 = "HIVStatus",
                unit_var = "Subject",
                taxon_level = "genus",
-               which_taxon = "Corynebacterium",
+               which_taxon = "Staphylococcus",
                palette_input= this_palette,
                title = "Spaghetti Plot",
                subtitle = NULL) +
@@ -100,54 +261,136 @@ plot_spaghetti(dat = dat_0.05,
   ggplot2::ylab("Relative Abundance (log CPM)")
 ```
 
-## GEE Modeling
+### Stacked bar plot
+
+Stacked bar plots are used here to visualize the relative abundance of microbes at a given taxonomic level in each sample, represented as a single bar, labeled by time point, and plotted within each HIV exposure status group for separate mothers and infant comparisons. Use `plot_stacked_bar`.
 ```{R}
-output <- run_gee_model(dat_0.05, unit_var = "Subject",
-                        fixed_cov = c("HIVStatus", "MothChild", "Age"),
-                        corstr = "ar1",
-                        plot_out = FALSE,
-                        plotsave_loc = ".",
-                        plot_terms = NULL)
-
-head(output)
-
-# Trying out plotting
-run_gee_model(dat_0.05, unit_var = "Subject",
-              taxon_level = "genus",
-              fixed_cov = c("MothChild", "HIVStatus", "Age"),
-              corstr = "ar1",
-              plot_out = TRUE,
-              plotsave_loc = "/restricted/projectnb/infant-microbiome/work/aodom",
-              plot_terms = "MothChild",
-              width = 6, height = 4, units = "in", scale = 0.7)
-
+plot_stacked_bar(dat_filt, "genus", 
+             "HIVStatus",
+             "timepoint",
+             palette_input = this_palette)
 ```
 
-# Add hotelling
+
+### Stacked area chart
+Stacked area charts are similar to stacked bar plots, but provide for continuity between time points. These are created with `plot_stacked_area()`.  
 
 ```{R}
-test_hotelling_t2(dat = dat_0.05,
-                  test_index = which(dat_0.05$MothChild == "Infant" &
-                                       dat_0.05$timepoint == 6),
+plot_stacked_area(dat_filt, "genus", 
+                  "HIVStatus",
+                  "timepoint",
+                  palette_input = this_palette)
+```
+
+
+
+# Longitudinal data analysis
+
+For a concrete analysis of longitudinal microbiome data, `LegATo` provides NMIT, both a paired and unpaired multivariate Hotelling's T-squared test, generalized estimating equations (GEEs) and linear mixed effects models (LMEMs/LMMs).
+
+**Detailed explanations of each are available on the LegATo website:**
+
+* [Nonparametric microbial interdependence test (NMIT)](https://wejlab.github.io/LegATo-docs/articles/NMIT.html)
+* [Modeling with GEEs and LMMs](https://wejlab.github.io/LegATo-docs/articles/Modeling.html)
+* [Hotelling's T-Squared test](https://wejlab.github.io/LegATo-docs/articles/NMIT.html)
+
+
+Otherwise a brief overview of each method is provided below.
+
+## Nonparametric microbial interdependence test (NMIT)
+
+NMIT is a multivariate distance-based test intended to evaluate the association between key phenotypic variables and microbial interdependence. The test determines longitudinal sample similarity as a function of temporal microbial composition. 
+  
+The authors thank Yilong Zhang for providing his code for adaptation into LegATo.
+  
+Citations:
+
+Yilong Zhang, Sung Won Han, Laura M Cox, and Huilin Li. A multivariate distance-based analytic framework for microbial interdependence association test in longitudinal study. Genetic epidemiology, 41(8):769–778, 2017. doi:10.1002/gepi.22065.
+```{R}
+dat_0.1 <- filter_animalcules_MAE(dat_cleaned, 0.1)
+NMIT(dat_0.1, unit_var = "Subject", fixed_cov = "HIVStatus",
+     covariate_time = "timepoint",
+     method = "kendall", dist_type = "F",
+     heatmap = TRUE, classify = FALSE, fill_na = 0)
+```
+
+## Hotelling's T^2 Test
+
+Hotelling’s T2 tests can be used to determine whether the microbiome profiles exhibit notable differences or trends across time and groups. We may then use t-tests to identify which genera contributed most to these differences.
+
+For this example, HEU and HUU infants are designated as the two sampling units on which the relative abundances of the p most abundant genera will be measured. 
+
+For paired tests, we chose p = 6 variables to ensure that n < p so that singularity could be avoided and T2 could be properly computed, where n is the number of measurements in a sampling unit. Normality is met by using microbe abundances in log CPM units, which is calculated within the function.
+
+```{R}
+test_hotelling_t2(dat = dat_filt,
+                  test_index = which(dat_filt$MothChild == "Infant" &
+                                       dat_filt$timepoint == 6),
                   taxon_level = "genus",
                   # To avoid n < p, use top 5-6 species
                   num_taxa = 6,
                   paired = TRUE,
                   grouping_var = "HIVStatus",
                   pairing_var = "pairing")
+```
 
-test_hotelling_t2(dat = dat_0.05,
-                  test_index = which(dat_0.05$MothChild == "Mother" &
-                                      dat_0.05$timepoint == 0),
+Group comparisons can also be tested on unpaired data:
+```{R}
+test_hotelling_t2(dat = dat_filt,
+                  test_index = which(dat_filt$timepoint == 0),
                   taxon_level = "genus",
                   # To avoid n < p, use top 5-6 species
-                  num_taxa = 12,
+                  num_taxa = 6,
                   grouping_var = "HIVStatus",
                   unit_var = "Subject",
                   paired = FALSE)
-  
+
 ```
 
+## Modeling
+
+### Generalized Estimating Equations (GEEs)
+
+Generalized estimating equations (GEEs) as described in Liang and Zeger (1986) and extended by Agresti (2002) have been widely used for modeling longitudinal data, and more recently for longitudinal microbiome data.
+
+For each genus present in the microbial aggregate of samples, we model normalized log CPM relative taxon counts, estimating the effects of time point and HIV exposure status and their interaction, while accounting for the underlying structure of clusters formed by individual subjects. 
+
+```{R}
+output <- run_gee_model(dat_filt, unit_var = "Subject",
+                        fixed_cov = c("HIVStatus", "timepoint"),
+                        corstr = "ar1",
+                        plot_out = FALSE,
+                        plotsave_loc = ".",
+                        plot_terms = NULL)
+
+head(output) |> knitr::kable(caption = "GEE Outputs")
+```
+
+You can also create plots of the covariates, which will be saved to a folder specified by the user:
+
+```{R}
+tempfolder <- tempfile()
+dir.create(tempfolder)
+
+# Trying out plotting
+output <- run_gee_model(dat_filt, unit_var = "Subject",
+              taxon_level = "genus",
+              fixed_cov = c("HIVStatus", "timepoint"),
+              corstr = "ar1",
+              plot_out = TRUE,
+              plotsave_loc = tempfolder,
+              plot_terms = "timepoint",
+              width = 6, height = 4, units = "in", scale = 0.7)
+
+unlink(tempfolder, recursive = TRUE)
+```
+
+```{R,  out.width = "50%", fig.align = "center", echo = FALSE}
+knitr::include_graphics("Dolosigranulum_timepoint.png")
+knitr::include_graphics("Streptococcus_timepoint.png")
+```
+
+# Session Info
 
 ```{R}
 sessionInfo()

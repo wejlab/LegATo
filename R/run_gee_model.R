@@ -1,6 +1,6 @@
 # If emmeans doesn't work, may need to step through function
-mk_gee_plot <- function(this_coef, complex, tn,
-                        plotsave_loc, unit_var, plot_terms, ...) {
+mk_gee_plot <- function(this_coef, complex, tn, unit_var,
+                        plotsave_loc, plot_terms, ...) {
   term_input <- unique(c(this_coef, plot_terms))
   p <- plot(ggeffects::ggemmeans(complex, terms = term_input)) + 
     ggplot2::labs(subtitle = "Estimated marginal means",

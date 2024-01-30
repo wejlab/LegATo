@@ -19,43 +19,42 @@
 #' 
 
 clean_animalcules_MAE <- function(dat) {
+  # Extract data
   parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
   tax_table <- parsed$tax
-  sam_table <- parsed$sam
   counts_table <- parsed$counts
-
+  # Preliminary fixing of species names
+  if(!all(c("genus", "species") %in% colnames(tax_table))) {
+    stop("Columns 'genus' and 'species' must be present in taxonomy table.")
+  }
+  if(!all.equal(rownames(tax_table), rownames(counts_table))) {
+    stop("Error in parsing MAE")
+  }
+  # Only need to alter species names in tax_table initially
   se_rowData  <- tax_table %>%
-    dplyr::mutate("species" = stringr::str_remove_all(.data$species, "\\[|\\]"))
-  
-  # Replace species that are others with "sp."
+    dplyr::mutate("species" = stringr::str_remove_all(.data$species, "\\[|\\]"),
+                  "species" = stringr::str_replace_all(.data$species, "_", " "))
+  ## Replace species that are others with "sp."
   ind <- se_rowData$species == "others"
   se_rowData$species[ind] <- paste(se_rowData$genus[ind], "sp.", sep = " ")
-  # Replace genus that are others with species information
+  ## Replace genus that are others with species information
   ind <- se_rowData$genus == "others" & !is.na(se_rowData$genus)
   all_split <- plyr::aaply(strsplit(se_rowData$species, " "), 1,
                            function(x) x[[1]])
   se_rowData$genus[ind] <- all_split[ind]
+  # Consolidate tax and counts to species level
+  up_counts <- animalcules::upsample_counts(counts_table, se_rowData,
+                                            higher_level = "species")
+  up_rowData <- se_rowData %>%
+    tibble::remove_rownames() %>%
+    dplyr::distinct(.data$species, .keep_all = TRUE)
+  ind <- match(rownames(up_counts), up_rowData$species)
+  up_rowData <- up_rowData[ind, ]
+  rownames(up_rowData) <- up_rowData$species
   
-  #ISSUE: DUplicates because we need to consolidate down to species level
-  
-  # Fix rownames
-  if (all.equal(rownames(tax_table), rownames(counts_table))) {
-    to_rownames <- stringr::str_replace_all(se_rowData$species, "_", " ")
-    rownames(se_rowData) <- rownames(counts_table) <- to_rownames
-    # Alphabetize
-    se_rowData_final <- se_rowData[order(to_rownames),]
-    counts_table_final <- counts_table[order(to_rownames),]
-  } else (stop("Mismatch of rownames in datasets"))
-
-  se_mgx <- counts_table %>% base::data.matrix() %>% S4Vectors::SimpleList() %>%
-    magrittr::set_names("MGX")
-
-  microbe_se <- SummarizedExperiment::SummarizedExperiment(
-    assays = se_mgx, colData = sam_table, rowData = se_rowData)
-  MAE_out <- MultiAssayExperiment::MultiAssayExperiment(
-    experiments = S4Vectors::SimpleList(MicrobeGenetics = microbe_se),
-    colData = sam_table)
-  
+  MAE_out <- create_formatted_MAE(counts_dat = up_counts,
+                                  tax_dat = up_rowData,
+                                  metadata_dat = parsed$sam)
   return(MAE_out)
 }
 

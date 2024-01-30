@@ -13,7 +13,8 @@ NMIT(
   dist_type = "F",
   heatmap = TRUE,
   classify = FALSE,
-  fill_na = 0
+  fill_na = 0,
+  ...
 )
 }
 \arguments{
@@ -22,7 +23,8 @@ animalcules output.}
 
 \item{unit_var}{a numeric vector of subject.}
 
-\item{fixed_cov}{A character vector of covariates of interest found in dat.}
+\item{fixed_cov}{A character vector of covariates of interest found in
+\code{dat}.}
 
 \item{covariate_time}{Character string giving the name of the discrete
 time-based covariate in the metadata to group abundances by.}
@@ -30,30 +32,43 @@ time-based covariate in the metadata to group abundances by.}
 \item{method}{an option of the correlation method ("pearson", "kendall",
 "spearman"). The default method is "kendall".}
 
-\item{dist_type}{A character strin specifying the type of matrix norm to be computed. The default is \code{"F"}. 
+\item{dist_type}{A character string specifying the type of matrix norm to be
+  computed. The default is \code{"F"}.
 \itemize{
-    \item{\code{"M"} or \code{"m"}}{specifies the maximum modulus of all the elements in \code{x}.}
-    \item{\code{"O"}, \code{"o"} or \code{"1"}}{specifies the one norm, (maximum absolute column sum);}
-    \item{\code{"I"} or \code{"i"}}{specifies the infinity norm (maximum absolute row sum);}
-    \item{\code{"F"} or \code{"f"}}{specifies the Frobenius norm (the Euclidean norm of \code{x} treated as if it were a vector); and}
+    \item{\code{"M"} or \code{"m"}}{specifies the maximum modulus of all the
+    elements in \code{x}.}
+    \item{\code{"O"}, \code{"o"} or \code{"1"}}{specifies the one norm,
+    (maximum absolute column sum);}
+    \item{\code{"I"} or \code{"i"}}{specifies the infinity norm (maximum
+    absolute row sum);}
+    \item{\code{"F"} or \code{"f"}}{specifies the Frobenius norm (the
+    Euclidean norm of \code{x} treated as if it were a vector)}
 }}
 
-\item{heatmap}{A logical value indicating whether to draw heatmap. The default is \code{TRUE}.}
+\item{heatmap}{A logical value indicating whether to draw heatmap. The
+default is \code{TRUE}.}
 
-\item{classify}{A logical value indicating whether to draw a classifier tree. The default is \code{FALSE}.}
+\item{classify}{A logical value indicating whether to draw a classifier tree.
+The default is \code{FALSE}.}
 
-\item{fill_na}{A number between 0 and 1 to fill \code{NA} values. The default value is 0.}
+\item{fill_na}{A number between 0 and 1 to fill \code{NA} values. The default
+value is 0.}
+
+\item{...}{Additional arguments to be passed to \code{ComplexHeatmap::Heatmap()}.}
 }
 \value{
-This function returns an analysis of variance (ANOVA) table showing sources of variation,
-degrees of freedom, sequential sums of squares, mean squares, F statistics, partial R-squared and P values,
-based on 999 permutations.
+This function returns an analysis of variance (ANOVA) table showing
+  sources of variation, degrees of freedom, sequential sums of squares, mean
+  squares, F statistics, partial R-squared and P values, based on 999
+  permutations.
 }
 \description{
-The package performs a multivariate distance-based test for group comparisons of
-microbial temporal interdependence. The NMIT test provides a comprehensive way to evaluate
-the association between key phenotypic variables and microbial interdependence.
-This function is recommended for use after a filtering step using \code{filter_animalcules_MAE}.
+An R-based implementation of the NMIT, a multivariate distance-based test for
+group comparisons of microbial temporal interdependence. The NMIT test
+provides a comprehensive way to evaluate the association between key
+phenotypic variables and microbial interdependence. This function is
+recommended for use after a filtering step using
+\code{filter_animalcules_MAE}.
 }
 \examples{
 dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()

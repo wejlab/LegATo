@@ -11,8 +11,9 @@ Authors@R: c(
     person("Jordan", "Pincus", , "pincus@bu.edu", role = "art",
            comment = "Artist of LegATo icon")
   )
-Description: LegATo is a suite of open-source software tools for streamlining longitudinal microbiome analysis, 
-    integrating visualization, modeling and testing procedures.
+Description: LegATo is a suite of open-source software tools for
+    streamlining longitudinal microbiome analysis, integrating
+    visualization, modeling and testing procedures.
 License: MIT + file LICENSE
 Depends:
     R (>= 4.3.0)
@@ -20,7 +21,6 @@ Imports:
     animalcules,
     data.table,
     dplyr,
-    geepack,
     ggplot2,
     magrittr,
     MultiAssayExperiment,
@@ -28,7 +28,6 @@ Imports:
     S4Vectors,
     stringr,
     SummarizedExperiment,
-    TBSignatureProfiler,
     tibble,
     tidyr,
     tidyselect
@@ -36,6 +35,7 @@ Suggests:
     BiocStyle,
     biomformat,
     broom,
+    ComplexHeatmap,
     emmeans,
     ggalluvial,
     ggeffects,
@@ -50,9 +50,17 @@ Suggests:
     Rsubread,
     spelling,
     sys,
+    TBSignatureProfiler,
     testthat,
     usethis,
-    vegan
+    vegan,
+    RColorBrewer,
+    circlize,
+    geepack,
+    paletteer,
+    broom.mixed,
+    lmerTest,
+    lme4
 VignetteBuilder: 
     knitr
 BiocType: Software

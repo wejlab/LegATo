@@ -12,10 +12,12 @@ reference:
     - plot_spaghetti
     - plot_stacked_area
     - plot_stacked_bar
+    - plot_heatmap
   - title: "Analyze Longitudinal Microbial Data"
     desc: "Conduct Hotelling's T-squared tests, NMIT, and model data."
     contents:  
     - run_gee_model
+    - run_lmm_model
     - test_hotelling_t2
     - NMIT
     - tscor
@@ -44,6 +46,12 @@ navbar:
       menu:
         - text: "Command Line Analysis"
           href: articles/LegATo_vignette.html
+        - text: "NMIT"
+          href: articles/NMIT.html
+        - text: "Modeling with GEEs and LMMs"
+          href: articles/Modeling.html
+        - text: "Hotelling's T-Squared Test"
+          href: articles/Hotelling.html
     - text: "Function Reference"
       href: reference/index.html
     - text: "Package News"

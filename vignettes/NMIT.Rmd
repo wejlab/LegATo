@@ -1,0 +1,37 @@
+---
+title: "NMIT"
+author: 
+- name: Aubrey R. Odom
+  affiliation: 
+  - Program in Bioinformatics, Boston University, Boston, MA
+  email: aodom@bu.edu
+date: '`r format(Sys.Date(), "%B %e, %Y")`'
+package: LegATo
+output: 
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{NMIT}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+# Nonparametric microbial interdependence test (NMIT)
+
+This tutorial will describe the NMIT function.
+
+https://docs.qiime2.org/2018.8/tutorials/longitudinal/#non-parametric-microbial-interdependence-test-nmit
+
+----
+Citations:
+
+Yilong Zhang, Sung Won Han, Laura M Cox, and Huilin Li. A multivariate distance-based analytic framework for microbial interdependence association test in longitudinal study. Genetic epidemiology, 41(8):769–778, 2017. doi:10.1002/gepi.22065.
+
+Bokulich, Nicholas A., et al. "q2-longitudinal: longitudinal and paired-sample analyses of microbiome data." MSystems 3.6 (2018): 10-1128.
+
+# Session Info
+
+```{R}
+sessionInfo()
+```

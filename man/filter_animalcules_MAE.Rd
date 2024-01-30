@@ -5,13 +5,14 @@
 \title{Filter a MultiAssayExperiment to a top percentage of taxa and label the rest
 as "Other"}
 \usage{
-filter_animalcules_MAE(dat, filter_pct = 0.05)
+filter_animalcules_MAE(dat, filter_prop = 0.001)
 }
 \arguments{
 \item{dat}{A \code{MultiAssayExperiment} object specially formatted as an
 animalcules output.}
 
-\item{filter_pct}{A double strictly between 0 and 1.}
+\item{filter_prop}{A double strictly between 0 and 1, representing
+the proportion of relative abundance at which to filter. Default is 0.001.}
 }
 \value{
 An animalcules-formatted \code{MultiAssayExperiment} object with
@@ -20,7 +21,7 @@ An animalcules-formatted \code{MultiAssayExperiment} object with
 \description{
 This function takes an animalcules-formatted \code{MultiAssayExperiment}
 (MAE) object and identifies all taxa at the "genus" level that represent
-<\code{filter_pct} average relative abundance across all samples in the MAE.
+<\code{filter_prop} average relative abundance across all samples in the MAE.
 After identification at the genus level, taxa across the genus and species
 levels are then consolidated into the category "Other".
 }

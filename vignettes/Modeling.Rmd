@@ -1,0 +1,32 @@
+---
+title: "Modeling with GEEs and LMMs"
+author: 
+- name: Aubrey R. Odom
+  affiliation: 
+  - Program in Bioinformatics, Boston University, Boston, MA
+  email: aodom@bu.edu
+date: '`r format(Sys.Date(), "%B %e, %Y")`'
+package: LegATo
+output: 
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Modeling with GEEs and LMMs}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+# Modeling with LegATo
+
+Coming soon.
+
+## GEEs
+
+## LMMs
+
+# Session Info
+
+```{R}
+sessionInfo()
+```

@@ -63,6 +63,8 @@ saveRDS(MAE, file.path(stem2, "MAE.RDS"))
 
 This file is a small-form animalcules-formatted MAE object intended for usage with the examples.
 ```{R, eval = FALSE}
+stem2 <- "/restricted/projectnb/infant-microbiome/work/aodom/LegATo/inst/extdata"
+
 # Creating the sample data
 which_sex <- sample(c("Male", "Female"), 10, replace = TRUE)
 sample_table <- tibble(Sample = paste0("X-", seq_len(50)),
@@ -72,7 +74,7 @@ sample_table <- tibble(Sample = paste0("X-", seq_len(50)),
                        Group = rep(c("A", "B"), 25),
                        Pairing = rep(rep(seq_len(5), each = 2), 5)) %>%
   mutate("HairLength" = rnorm(50, mean = 50, sd = 14.5),
-         "Age" = runif(50, 21, 80)) %>%
+         "Age" = round(runif(50, 21, 80), 1)) %>%
   as.data.frame()
 rownames(sample_table) <- sample_table$Sample
 
@@ -97,12 +99,15 @@ se_rowData <- tax_dat %>% base::data.frame() %>%
     dplyr::mutate_all(as.character) %>% S4Vectors::DataFrame()
 se_colData  <- sample_table %>% S4Vectors::DataFrame()
 
+write.csv(counts_dat, file.path(stem2, "counts.csv"))
+write.csv(tax_dat, file.path(stem2, "tax.csv"))
+write.csv(se_colData, file.path(stem2, "sample.csv"))
+
 microbe_se <- SummarizedExperiment::SummarizedExperiment(
   assays = se_mgx, colData = se_colData, rowData = se_rowData)
 MAE_out <- MultiAssayExperiment::MultiAssayExperiment(
   experiments = S4Vectors::SimpleList(MicrobeGenetics = microbe_se),
   colData = se_colData)
 
-stem2 <- "/restricted/projectnb/infant-microbiome/work/aodom/LMTK/inst/extdata"
 saveRDS(MAE_out, file.path(stem2, "MAE_small.RDS"))
 ```
