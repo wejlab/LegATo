@@ -84,8 +84,8 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
 #' default is \code{NULL}.
 #' @param name a character string with the name of the data to be displayed.
 #' Default is \code{"Input data"}.
-#' @param signatureColNames a vector of the column names in \code{colData} that
-#' contain the signature data. Only required if \code{inputData} is a
+#' @param plottingColNames a vector of the column names in \code{colData} that
+#' contain the plotting data. Only required if \code{inputData} is a
 #' SummarizedExperiment object.
 #' @param annotationColNames a vector of the column names in \code{colData} that
 #' contain the annotation data. Only required if \code{inputData} is a
@@ -101,13 +101,13 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
 #' if the annotation is continuous.
 #' By default, \code{ColorBrewer} color sets will be used.
 #' See the the parameter \code{colorSets} for additional details.
-#' @param scale logical. Setting \code{scale = TRUE} scales the signature data.
+#' @param scale logical. Setting \code{scale = TRUE} scales the plotting data.
 #' The default is \code{FALSE}.
 #' @param showColumnNames logical. Setting \code{showColumnNames = TRUE} will
 #' show the column names (i.e. sample names) on the heatmap. The default is
 #' \code{TRUE}.
 #' @param showRowNames logical. Setting \code{showColumnNames = TRUE} will
-#' show the row names (i.e. signature names) on the heatmap. The default is
+#' show the row names (i.e. plotting names) on the heatmap. The default is
 #' \code{TRUE}.
 #' @param colorSets a vector of names listing the color sets in the order
 #' that they should be used in creating the heatmap. By default, this function
@@ -119,13 +119,11 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
 #' heatmap gradient, or a \code{colorRamp} function produced by
 #' \code{circlize::colorRamp2}. The default is \code{c("blue", "gray95", "red")}.
 #' @param split_heatmap a character string either giving the column title of
-#' \code{annotationSignature} containing annotation data for which to split
-#' the heatmap rows (i.e., signatures), or \code{"none"} if no split is desired.
-#' To split based on the type of signature, set \code{split_heatmap = "disease"}.
-#' The default is \code{"none"}.
-#' @param annotationSignature a \code{data.frame} or \code{matrix} with information
+#' \code{annotationplotting} containing annotation data for which to split
+#' the heatmap rows, or \code{"none"} if no split is desired.
+#' @param annotationplotting a \code{data.frame} or \code{matrix} with information
 #' to be used
-#' in splitting the heatmap. The first column should signature names. The
+#' in splitting the heatmap. The first column should plotting names. The
 #' column of annotation information should be specified in \code{split_heatmap.}
 #' Other columns will be ignored. The default is \code{sigAnnotData}.
 #' @param column_order a vector of character strings indicating the order in
@@ -140,43 +138,44 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
 #' 
 #'
 #' @export
+#'@examples
+#' library(SummarizedExperiment)
+#' # Generate some artificial data that shows a difference in Zak_RISK_16
+#' mat_testdata <- rbind(matrix(c(rnorm(80), rnorm(80) + 5), 16, 10,
+#'                              dimnames = list(paste0("Taxon", seq_len(16)),
+#'                                              paste0("sample", seq_len(10)))),
+#'                       matrix(rnorm(1000), 100, 10,
+#'                              dimnames = list(paste0("Taxon0", seq_len(100)),
+#'                                              paste0("sample", seq_len(10)))))
+#' cov_mat <- data.frame(sample = c(rep("down", 5), rep("up", 5))) |>
+#'   magrittr::set_rownames(paste0("sample", seq_len(10)))
+#' 
+#' # Example using custom colors for the annotation information
+#' color2 <- stats::setNames(c("purple", "black"), c("down", "up"))
+#' color.list <- list("sample" = color2)
+#' 
+#' plot_heatmap(
+#'   inputData = mat_testdata,
+#'   annotationData = cov_mat,
+#'   name = "Data",
+#'   plot_title = "Example",
+#'   plottingColNames = NULL,
+#'   annotationColNames = NULL,
+#'   colList = color.list,
+#'   scale = FALSE,
+#'   showColumnNames = TRUE,
+#'   showRowNames = FALSE,
+#'   colorSets = c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Accent", "Dark2",
+#'                 "Paired"),
+#'   choose_color = c("blue", "gray95", "red"),
+#'   split_heatmap = "none",
+#'   column_order = NULL
+#' )
 #'
-# @examples
-# library(SummarizedExperiment)
-# # Generate some artificial data that shows a difference in Zak_RISK_16
-# mat_testdata <- rbind(matrix(c(rnorm(80), rnorm(80) + 5), 16, 10,
-#                              dimnames = list(TBsignatures$Zak_RISK_16,
-#                                              paste0("sample", seq_len(10)))),
-#                       matrix(rnorm(1000), 100, 10,
-#                              dimnames = list(paste0("gene", seq_len(100)),
-#                                              paste0("sample", seq_len(10)))))
-# # Create a SummarizedExperiment object that contains the data
-# testdataSE <- SummarizedExperiment(assays = SimpleList(data = mat_testdata),
-#                                      colData = DataFrame(sample =
-#                                                            c(rep("down", 5),
-#                                                                 rep("up", 5))))
-# res <- runTBsigProfiler(testdataSE, useAssay = "data",
-#                         signatures = TBsignatures["Zak_RISK_16"],
-#                         algorithm = c("GSVA", "ssGSEA"), parallel.sz = 1,
-#                         combineSigAndAlgorithm = TRUE)
-# signatureHeatmap(res, signatureColNames = c("GSVA_Zak_RISK_16",
-#                                             "ssGSEA_Zak_RISK_16"),
-#                  annotationColNames = "sample", scale = TRUE,
-#                  showColumnNames = FALSE, split_heatmap = "none")
-#
-# # Example using custom colors for the annotation information
-# color2 <- stats::setNames(c("purple", "black"), c("down", "up"))
-# color.list <- list("sample" = color2)
-#
-# signatureHeatmap(res, signatureColNames = c("GSVA_Zak_RISK_16",
-#                                             "ssGSEA_Zak_RISK_16"),
-#                  annotationColNames = "sample", scale = TRUE,
-#                  showColumnNames = FALSE,
-#                  colList = color.list, split_heatmap = "none")
-#
+
 plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
                          name = "Input data",
-                         signatureColNames,
+                         plottingColNames,
                          annotationColNames = NULL,
                          colList = list(), scale = FALSE,
                          showColumnNames = TRUE,
@@ -185,22 +184,22 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
                                                             "Paired"),
                          choose_color = c("blue", "gray95", "red"),
                          split_heatmap = "none",
-                         annotationSignature = NULL,
+                         annotationplotting = NULL,
                          column_order = NULL,
                          ...) {
   if (methods::is(inputData, "SummarizedExperiment")) {
-    if (any(duplicated(signatureColNames))) {
-      stop("Duplicate signature column name is not supported.")
+    if (any(duplicated(plottingColNames))) {
+      stop("Duplicate plotting column name is not supported.")
     }
-    if (!all(signatureColNames %in% colnames(SummarizedExperiment::colData(inputData)))) {
-      stop("Signature column name not found in inputData.")
+    if (!all(plottingColNames %in% colnames(SummarizedExperiment::colData(inputData)))) {
+      stop("plotting column name not found in inputData.")
     }
     if (!is.null(annotationColNames)) {
       if (!all(annotationColNames %in% colnames(SummarizedExperiment::colData(inputData)))) {
         stop("Annotation column name not found in inputData.")
       }
       annotationData <- SummarizedExperiment::colData(inputData)[, annotationColNames, drop = FALSE]
-      inputData <- SummarizedExperiment::colData(inputData)[, signatureColNames, drop = FALSE]
+      inputData <- SummarizedExperiment::colData(inputData)[, plottingColNames, drop = FALSE]
     }
   } else {
     if (is.null(annotationData)) {
@@ -212,30 +211,30 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
   if (!is.null(annotationData)) {
     if (nrow(annotationData) == nrow(inputData)) {
       if (!all(rownames(annotationData) == rownames(inputData))) {
-        stop("Annotation data and signature data does not match.")
+        stop("Annotation data and plotting data does not match.")
       }
     } else if (nrow(annotationData) == ncol(inputData)) {
       if (!all(rownames(annotationData) == colnames(inputData))) {
-        stop("Annotation data and signature data does not match.")
+        stop("Annotation data and plotting data does not match.")
       }
       inputData <- t(inputData)
     } else {
-      stop("Annotation data and signature data does not match.")
+      stop("Annotation data and plotting data does not match.")
     }
   }
   sigresults <- t(as.matrix(inputData))
   if (scale) {
     sigresults <- t(scale(t(sigresults)))
   }
-  # To split heatmap by signatures
+  # To split heatmap by plotting annotation
   if (split_heatmap != "none") {
-    if (!(split_heatmap %in% colnames(annotationSignature))) {
+    if (!(split_heatmap %in% colnames(annotationplotting))) {
       stop("The column specified in 'split_heatmap' must be in the matrix or data.frame
-           provided by 'annotationSignature'")
+           provided by 'annotationplotting'")
     }
   }
-  ann_data <- annotationSignature[annotationSignature[, 1] %in%
-                                    signatureColNames, ]
+  ann_data <- annotationplotting[annotationplotting[, 1] %in%
+                                    plottingColNames, ]
   if (split_heatmap == "none") {
     row_split_pass <- c()
   } else {

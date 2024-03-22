@@ -9,7 +9,7 @@ plot_heatmap(
   annotationData = NULL,
   plot_title = NULL,
   name = "Input data",
-  signatureColNames,
+  plottingColNames,
   annotationColNames = NULL,
   colList = list(),
   scale = FALSE,
@@ -19,7 +19,7 @@ plot_heatmap(
     "Paired"),
   choose_color = c("blue", "gray95", "red"),
   split_heatmap = "none",
-  annotationSignature = NULL,
+  annotationplotting = NULL,
   column_order = NULL,
   ...
 )
@@ -43,8 +43,8 @@ default is \code{NULL}.}
 \item{name}{a character string with the name of the data to be displayed.
 Default is \code{"Input data"}.}
 
-\item{signatureColNames}{a vector of the column names in \code{colData} that
-contain the signature data. Only required if \code{inputData} is a
+\item{plottingColNames}{a vector of the column names in \code{colData} that
+contain the plotting data. Only required if \code{inputData} is a
 SummarizedExperiment object.}
 
 \item{annotationColNames}{a vector of the column names in \code{colData} that
@@ -63,7 +63,7 @@ if the annotation is continuous.
 By default, \code{ColorBrewer} color sets will be used.
 See the the parameter \code{colorSets} for additional details.}
 
-\item{scale}{logical. Setting \code{scale = TRUE} scales the signature data.
+\item{scale}{logical. Setting \code{scale = TRUE} scales the plotting data.
 The default is \code{FALSE}.}
 
 \item{showColumnNames}{logical. Setting \code{showColumnNames = TRUE} will
@@ -71,7 +71,7 @@ show the column names (i.e. sample names) on the heatmap. The default is
 \code{TRUE}.}
 
 \item{showRowNames}{logical. Setting \code{showColumnNames = TRUE} will
-show the row names (i.e. signature names) on the heatmap. The default is
+show the row names (i.e. plotting names) on the heatmap. The default is
 \code{TRUE}.}
 
 \item{colorSets}{a vector of names listing the color sets in the order
@@ -86,14 +86,12 @@ heatmap gradient, or a \code{colorRamp} function produced by
 \code{circlize::colorRamp2}. The default is \code{c("blue", "gray95", "red")}.}
 
 \item{split_heatmap}{a character string either giving the column title of
-\code{annotationSignature} containing annotation data for which to split
-the heatmap rows (i.e., signatures), or \code{"none"} if no split is desired.
-To split based on the type of signature, set \code{split_heatmap = "disease"}.
-The default is \code{"none"}.}
+\code{annotationplotting} containing annotation data for which to split
+the heatmap rows, or \code{"none"} if no split is desired.}
 
-\item{annotationSignature}{a \code{data.frame} or \code{matrix} with information
+\item{annotationplotting}{a \code{data.frame} or \code{matrix} with information
 to be used
-in splitting the heatmap. The first column should signature names. The
+in splitting the heatmap. The first column should plotting names. The
 column of annotation information should be specified in \code{split_heatmap.}
 Other columns will be ignored. The default is \code{sigAnnotData}.}
 
@@ -117,6 +115,41 @@ If both \code{annotationData = NULL} and \code{annotationColNames = NULL},
 no annotation bar will be drawn on the heatmap.
 
 Code was adapted from the \code{TBSignatureprofiler} R package.
+}
+\examples{
+library(SummarizedExperiment)
+# Generate some artificial data that shows a difference in Zak_RISK_16
+mat_testdata <- rbind(matrix(c(rnorm(80), rnorm(80) + 5), 16, 10,
+                             dimnames = list(paste0("Taxon", seq_len(16)),
+                                             paste0("sample", seq_len(10)))),
+                      matrix(rnorm(1000), 100, 10,
+                             dimnames = list(paste0("Taxon0", seq_len(100)),
+                                             paste0("sample", seq_len(10)))))
+cov_mat <- data.frame(sample = c(rep("down", 5), rep("up", 5))) |>
+  magrittr::set_rownames(paste0("sample", seq_len(10)))
+
+# Example using custom colors for the annotation information
+color2 <- stats::setNames(c("purple", "black"), c("down", "up"))
+color.list <- list("sample" = color2)
+
+plot_heatmap(
+  inputData = mat_testdata,
+  annotationData = cov_mat,
+  name = "Data",
+  plot_title = "Example",
+  plottingColNames = NULL,
+  annotationColNames = NULL,
+  colList = color.list,
+  scale = FALSE,
+  showColumnNames = TRUE,
+  showRowNames = FALSE,
+  colorSets = c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Accent", "Dark2",
+                "Paired"),
+  choose_color = c("blue", "gray95", "red"),
+  split_heatmap = "none",
+  column_order = NULL
+)
+
 }
 \author{
 David Jenkins, Aubrey Odom

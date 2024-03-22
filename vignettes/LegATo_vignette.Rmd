@@ -174,7 +174,7 @@ dat_cleaned <- clean_animalcules_MAE(dat_subsetted)
 Many metagenomic pipelines identify taxon abundances at extremely small levels, which can be noisy to deal with in an analysis. The `filter_animalcules_MAE` function smoothly transforms reads belonging to taxa with an overall genera threshold under the `filter_prop` (filter proportion) argument, which we will set as 0.005.
 
 ```{R}
-dat_filt <- filter_animalcules_MAE(dat_cleaned, 0.005)
+dat_filt <- filter_animalcules_MAE(dat_cleaned, 0.05)
 ```
 
 ### Parse MAE to extract data
@@ -227,7 +227,8 @@ There are several plots by which we can visualize changes in relative abundance 
 
 We'll select a palette using `paletteer`.
 ```{R}
-this_palette <- paletteer::palettes_d$ggsci$springfield_simpsons |>
+this_palette <- c("#FED439", "#709AE1", "#8A9197", "#D2AF81", "#FD7446", "#D5E4A2", "#197EC0", "#F05C3B", "#46732E",
+                  "#71D0F5", "#370335", "#075149", "#C80813", "#91331F", "#1A9993", "#FD8CC1")|>
   magrittr::extract(seq_len(nrow(best_genus)))
 ```
 
@@ -282,7 +283,30 @@ plot_stacked_area(dat_filt, "genus",
                   palette_input = this_palette)
 ```
 
+### Heatmap
+With `plot_heatmap`, you can plot a heatmap of a specific microbe to determine changes along one or more covariates. 
 
+```{R}
+this_taxon <- parsed$counts |>
+  animalcules::upsample_counts(parsed$tax, "genus") |>
+  animalcules::counts_to_logcpm()
+p <- plot_heatmap(inputData = this_taxon,
+                  annotationData = dplyr::select(parsed$sam, "timepoint", "HIVStatus", "pairing"),
+                  name = "Data",
+                  plot_title = "Example",
+                  plottingColNames = NULL,
+                  annotationColNames = NULL,
+                  colList = list(),
+                  scale = FALSE,
+                  showColumnNames = FALSE,
+                  showRowNames = FALSE,
+                  colorSets = c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Accent", "Dark2",
+                                "Paired"),
+                  choose_color = c("blue", "gray95", "red"),
+                  split_heatmap = "none",
+                  column_order = NULL
+)
+```
 
 # Longitudinal data analysis
 
@@ -388,6 +412,21 @@ unlink(tempfolder, recursive = TRUE)
 ```{R,  out.width = "50%", fig.align = "center", echo = FALSE}
 knitr::include_graphics("Dolosigranulum_timepoint.png")
 knitr::include_graphics("Streptococcus_timepoint.png")
+```
+
+### Linear Mixed Models
+
+Similarly, you can also run linear mixed-effects models:
+```{R}
+output <- run_lmm_model(dat_filt, unit_var = "Subject",
+                        taxon_level = "genus",
+                        fixed_cov = c("timepoint", "HIVStatus"),
+                        plot_out = FALSE,
+                        plotsave_loc = ".",
+                        plot_terms = NULL)
+
+head(output) |> knitr::kable(caption = "LMM Outputs")
+
 ```
 
 # Session Info

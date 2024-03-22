@@ -1,22 +1,16 @@
-
-test_models_lmm <- function(tn, input_df, unit_var, fixed_cov,
+test_models_lm <- function(tn, input_df, fixed_cov,
                             plotsave_loc, plot_terms, plot_out, ...) {
-  filt_df <- input_df %>% 
-    dplyr::mutate("unit_var" = as.factor(input_df[, unit_var])) %>%
-    dplyr::filter(.data$taxon == tn) %>%
-    dplyr::arrange(.data$unit_var)
+  filt_df <- input_df %>%
+    dplyr::filter(.data$taxon == tn)
   group_vars <- paste("Abundance ~", paste(fixed_cov, collapse = " + ")) %>%
-    paste0(" + (1|", unit_var, ")") %>%
     stats::formula()
-  complex <- lmerTest::lmer(group_vars, data = filt_df,
-                        na.action = stats::na.omit)
+  complex <- stats::lm(group_vars, data = filt_df,
+                       na.action = stats::na.omit)
   #confidence <- lme4::confint.merMod(complex, quiet = FALSE) %>%
   #  as.data.frame() %>%
   #  tibble::rownames_to_column("term")
-  sum_comp <- broom.mixed::tidy(complex) %>%
-    # dplyr::left_join(confidence, by = "term") %>%
-    dplyr::filter(is.na(.data$group)) %>%
-    dplyr::select(-"group")
+  sum_comp <- broom.mixed::tidy(complex)
+    # dplyr::left_join(confidence, by = "term")
   
   if (plot_out) {
     plyr::a_ply(fixed_cov, 1, mk_gee_plot, complex = complex, tn = tn,
@@ -26,8 +20,8 @@ test_models_lmm <- function(tn, input_df, unit_var, fixed_cov,
     dplyr::mutate("Taxon" = tn) %>%
     dplyr::rename("Coefficient" = "term",
                   "Coefficient Estimate" = "estimate",
-    #              "Lower 95% CI" = "2.5 %",
-    #              "Upper 95% CI" = "97.5 %",
+                  #              "Lower 95% CI" = "2.5 %",
+                  #              "Upper 95% CI" = "97.5 %",
                   "Standard Error" = "std.error",
                   "Statistic" = "statistic",
                   "Unadj p-value" = "p.value") %>%
@@ -35,19 +29,16 @@ test_models_lmm <- function(tn, input_df, unit_var, fixed_cov,
   return(res_out)
 }
 
-
-#' Compute linear mixed-effects models (LMM) on longitudinal microbiome data
+#' Compute linear models (LMM) on microbiome data
 #'
 #' This function takes an animalcules-formatted \code{MultiAssayExperiment} and
-#' runs an independent LMM model for each taxon. The model predicts taxon log
-#' CPM abundance as a product of fixed-effects covariates with a random effect,
-#' usually the unit on which repeated measurements were taken.
+#' runs an independent linear model for each taxon. The model predicts taxon log
+#' CPM abundance as a product of user-specified covariates. This model can
+#' be used for general microbiome analyses without repeated measures data.
 #'
 #' P-values are adjusted for the model coefficients within each taxon. The
 #' following methods are permitted: \code{c("holm", "hochberg", "hommel",
 #' "bonferroni", "BH", "BY", "fdr", "none")}
-#' 
-#' 
 #'
 #' @inheritParams run_gee_model
 #'
@@ -59,14 +50,12 @@ test_models_lmm <- function(tn, input_df, unit_var, fixed_cov,
 #' dat <- system.file("extdata/MAE.RDS", package = "LegATo") |>
 #'   readRDS() |>
 #'   filter_animalcules_MAE(0.05)
-#' out <- run_lmm_model(dat, taxon_level = "genus", unit_var = "Subject",
-#'                      fixed_cov = c("HIVStatus", "timepoint"))
+#' out <- run_lm_model(dat, fixed_cov = c("timepoint", "HIVStatus"),
+#'                     plot_out = FALSE)
 #' head(out)
 #'
-
-run_lmm_model <- function(dat,
+run_lm_model <- function(dat,
                           taxon_level = "genus",
-                          unit_var,
                           fixed_cov,
                           p_adj_method = "fdr",
                           plot_out = FALSE,
@@ -76,13 +65,12 @@ run_lmm_model <- function(dat,
   input_df <- get_long_data(dat, taxon_level, log = TRUE, counts_to_CPM = TRUE)
   all_tn <- get_top_taxa(dat, taxon_level) %>% dplyr::pull("taxon")
   n <- length(all_tn)
-  storage <- plyr::llply(all_tn, test_models_lmm, input_df = input_df,
+  storage <- plyr::llply(all_tn, test_models_lm, 
+                         input_df = input_df,
                          fixed_cov = fixed_cov,
-                         unit_var = unit_var,
                          plot_out = plot_out,
                          plotsave_loc = plotsave_loc,
-                         plot_terms = plot_terms,
-                         ...) %>%
+                         plot_terms = plot_terms) %>%
     data.table::rbindlist() %>%
     dplyr::arrange(.data$Coefficient) %>%
     dplyr::group_by(.data$Coefficient) %>%

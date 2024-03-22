@@ -13,11 +13,13 @@ reference:
     - plot_stacked_area
     - plot_stacked_bar
     - plot_heatmap
+    - distinctColors
   - title: "Analyze Longitudinal Microbial Data"
     desc: "Conduct Hotelling's T-squared tests, NMIT, and model data."
     contents:  
     - run_gee_model
     - run_lmm_model
+    - run_lm_model
     - test_hotelling_t2
     - NMIT
     - tscor

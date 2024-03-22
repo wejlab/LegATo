@@ -21,3 +21,8 @@ editor_options:
 
 Coming soon.
 
+# Session Info
+
+```{R}
+sessionInfo()
+```
