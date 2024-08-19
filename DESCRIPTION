@@ -1,6 +1,6 @@
 Package: LegATo
 Title: LegATo: Longitudinal mEtaGenomic Analysis Toolkit
-Version: 0.99.0
+Version: 0.99.4
 Authors@R: c(
     person("Aubrey", "Odom", , "aodom@bu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7113-7598")),
@@ -31,6 +31,7 @@ Imports:
     ggplot2,
     magrittr,
     MultiAssayExperiment,
+    plyr,
     rlang,
     S4Vectors,
     stringr,
@@ -44,7 +45,6 @@ Suggests:
     broom.mixed,
     circlize,
     ComplexHeatmap,
-    emmeans,
     geepack,
     ggalluvial,
     ggeffects,
@@ -52,8 +52,6 @@ Suggests:
     knitr,
     lme4,
     lmerTest,
-    methods,
-    plyr,
     RColorBrewer,
     rmarkdown,
     spelling,
@@ -67,4 +65,4 @@ biocViews: MicrobiomeData, ReproducibleResearch, SequencingData
 Encoding: UTF-8
 Language: en-US
 LazyData: FALSE
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1

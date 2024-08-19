@@ -2,6 +2,7 @@
 #'
 #' Create a distinct palette for coloring different heatmap clusters. The
 #' function returns colors for input into \code{ComplexHeatmap:Heatmap()}.
+#' The "grDevices" package is required to use this function.
 #'
 #' @param n an integer describing the number of colors to generate. Required.
 #' @param hues a vector of character strings indicating the R colors available
@@ -27,6 +28,11 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
                                        "yellow", "purple", "green", "magenta"),
                            saturation.range = c(0.7, 1),
                            value.range = c(0.7, 1)) {
+  
+  if (!requireNamespace("grDevices", quietly = TRUE)) {
+    message("The 'grDevices' package is not installed",
+            "Please install it from CRAN to use this function.")
+  }
   
   if (!(all(hues %in% grDevices::colors()))) {
     stop("Only color names listed in the 'color'",
@@ -61,9 +67,10 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
 
 #' Plot a ComplexHeatmap.
 #'
-#' This function takes an arbitrary dataset as an input
-#' and returns a \code{ComplexHeatmap} plot. The function takes arguments listed here as well
-#' as any others to be passed on to \code{ComplexHeatmap::Heatmap()}.
+#' This function takes an arbitrary dataset as an input and returns a
+#' \code{ComplexHeatmap} plot. The function takes arguments listed here as well
+#' as any others to be passed on to \code{ComplexHeatmap::Heatmap()}. Note, the
+#' "circlize" and "ComplexHeatmap" packages are required to use this function.
 #'
 #' If both \code{annotationData = NULL} and \code{annotationColNames = NULL},
 #' no annotation bar will be drawn on the heatmap.
@@ -187,6 +194,12 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
                          annotationplotting = NULL,
                          column_order = NULL,
                          ...) {
+  # Ensure that ComplexHeatmap is installed
+  if (!requireNamespace("ComplexHeatmap", quietly = TRUE)) {
+    message("The 'ComplexHeatmap' package is not installed",
+            "Please install it from CRAN to use this function.")
+  }
+  
   if (methods::is(inputData, "SummarizedExperiment")) {
     if (any(duplicated(plottingColNames))) {
       stop("Duplicate plotting column name is not supported.")
@@ -247,8 +260,13 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
         if (is.numeric(annotationData[, annot])) {
           t1min <- min(annotationData[, annot], na.rm = TRUE)
           t1max <- max(annotationData[, annot], na.rm = TRUE)
-          colList[[annot]] <- circlize::colorRamp2(c(t1min, t1max),
-                                                   c("white", "blue"))
+          if (requireNamespace("circlize", quietly = TRUE)) {
+            colList[[annot]] <- circlize::colorRamp2(c(t1min, t1max),
+                                                     c("white", "blue"))
+          } else {
+            message("The 'circlize' package is not installed",
+                    "Please install it from CRAN to use this function.")
+          }
         } else {
           if (is.factor(annotationData[, annot][!is.na(annotationData[, annot])])) {
             condLevels <- levels(annotationData[, annot][!is.na(annotationData[, annot])])
@@ -258,6 +276,10 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
           if (length(condLevels) > 8) {
             colors <- distinctColors(length(condLevels))
           } else {
+            if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
+              message("The 'RColorBrewer' package is not installed",
+                      "Please install it from CRAN to use this function.")
+            }
             colors <- RColorBrewer::brewer.pal(8, colorSets[colorSetNum])
             colorSetNum <- colorSetNum + 1
           }

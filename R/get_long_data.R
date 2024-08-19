@@ -31,6 +31,11 @@ get_long_data <- function(dat, taxon_level, log = FALSE,
   SE_obj <- dat[["MicrobeGenetics"]]
   assay_name <- names(SummarizedExperiment::assays(SE_obj))[1]
   if (log | counts_to_CPM) {
+    # Check that TBSP is installed
+    if (!requireNamespace("TBSignatureProfiler", quietly = TRUE)) {
+      message("The 'TBSignatureProfiler' package is not installed",
+              "Please install it from Bioconductor to use this function.")
+    }
     SE_obj <- TBSignatureProfiler::mkAssay(SE_obj,
                                            input_name = assay_name,
                                            output_name = "assay",

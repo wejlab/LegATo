@@ -3,7 +3,7 @@
 #' This function takes a \code{MultiAssayExperiment} object and returns a
 #' alluvial diagram of microbe relative abundances. The function takes a single
 #' covariate as an optional variable by which to create a grid of multiple
-#' plots.
+#' plots. Note, the ggalluvial package is required to use this function.
 #'
 #' If further manipulation of specific parameters is desired, users can add
 #' \code{ggplot2} function calls to the output of the function.
@@ -28,6 +28,11 @@ plot_alluvial <- function(dat,
                           palette_input = NULL,
                           title = paste("Relative abundance at", taxon_level, "level"),
                           subtitle = NULL) {
+  if (!requireNamespace("ggalluvial", quietly = TRUE)) {
+    message("The 'ggalluvial' package is not installed",
+            "Please install it from CRAN to use this function.")
+  }
+  
   relabu_table <- get_stacked_data(dat, taxon_level, covariate_1, covariate_time)
   
   taxa_ordered <- get_top_taxa(dat, taxon_level) %>%

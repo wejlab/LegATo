@@ -45,7 +45,7 @@ A \code{ggplot2} plot.
 This function takes a \code{MultiAssayExperiment} object and returns a
 alluvial diagram of microbe relative abundances. The function takes a single
 covariate as an optional variable by which to create a grid of multiple
-plots.
+plots. Note, the ggalluvial package is required to use this function.
 }
 \details{
 If further manipulation of specific parameters is desired, users can add

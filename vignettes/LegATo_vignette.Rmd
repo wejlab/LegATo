@@ -67,7 +67,7 @@ LegATo functions expect data that is properly formatted in a `MultiAssayExperime
 
 ## A note on compatibility with other packages
 
-If you've analyzed your metagenomic or 16S data via the [MetaScope package](https://wejlab.github.io/metascope-docs/), you can aggregate your sample outputs with user-input metadata using the `convert_animalcules()` or `convert_animalcules_silva()` functions. These functions create a taxonomy table and collate all data into a LegATo- and animalcules-compatible `MultiAssayExperiment` object.
+If you've analyzed your metagenomic or 16S data via the [MetaScope package](https://wejlab.github.io/metascope-docs/), you can aggregate your sample outputs with user-input metadata using the `convert()` or `convert_silva()` functions. These functions create a taxonomy table and collate all data into a LegATo- and animalcules-compatible `MultiAssayExperiment` object.
 
 You can also format your data analyzed elsewhere (like PathoScope 2.0) with the [animalcules package](https://wejlab.github.io/animalcules-docs/) in the upload step with the R Shiny app, and then select "Download Animalcules File" to obtain a `MAE` object that can be used with LegATo.
 
@@ -163,18 +163,18 @@ This leaves us with `r dim(parse_MAE_SE(dat_subsetted)$sam)[1]` samples in our a
 
 ### Clean up animalcules-formatted MAEs
 
-If your data were aggregated via the `animalcules` package, as was done for the example data, the samples were aggregated at the strain taxonomic level and have residual taxonomy IDs present. The `clean_animalcules_MAE()` function cleans up data suffering from these issues.
+If your data were aggregated via the `animalcules` package, as was done for the example data, the samples were aggregated at the strain taxonomic level and have residual taxonomy IDs present. The `clean_MAE()` function cleans up data suffering from these issues.
 
 ```{R}
-dat_cleaned <- clean_animalcules_MAE(dat_subsetted)
+dat_cleaned <- clean_MAE(dat_subsetted)
 ```
 
 ### Filter MAE
 
-Many metagenomic pipelines identify taxon abundances at extremely small levels, which can be noisy to deal with in an analysis. The `filter_animalcules_MAE` function smoothly transforms reads belonging to taxa with an overall genera threshold under the `filter_prop` (filter proportion) argument, which we will set as 0.005.
+Many metagenomic pipelines identify taxon abundances at extremely small levels, which can be noisy to deal with in an analysis. The `filter_MAE` function smoothly transforms reads belonging to taxa with an overall genera threshold under the `filter_prop` (filter proportion) argument, which we will set as 0.005.
 
 ```{R}
-dat_filt <- filter_animalcules_MAE(dat_cleaned, 0.05)
+dat_filt <- filter_MAE(dat_cleaned, 0.05)
 ```
 
 ### Parse MAE to extract data
@@ -331,7 +331,7 @@ Citations:
 
 Yilong Zhang, Sung Won Han, Laura M Cox, and Huilin Li. A multivariate distance-based analytic framework for microbial interdependence association test in longitudinal study. Genetic epidemiology, 41(8):769–778, 2017. doi:10.1002/gepi.22065.
 ```{R}
-dat_0.1 <- filter_animalcules_MAE(dat_cleaned, 0.1)
+dat_0.1 <- filter_MAE(dat_cleaned, 0.1)
 NMIT(dat_0.1, unit_var = "Subject", fixed_cov = "HIVStatus",
      covariate_time = "timepoint",
      method = "kendall", dist_type = "F",

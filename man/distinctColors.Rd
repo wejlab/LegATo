@@ -33,6 +33,7 @@ HSV.
 \description{
 Create a distinct palette for coloring different heatmap clusters. The
 function returns colors for input into \code{ComplexHeatmap:Heatmap()}.
+The "grDevices" package is required to use this function.
 }
 \examples{
 

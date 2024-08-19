@@ -8,15 +8,21 @@ test_models_lmm <- function(tn, input_df, unit_var, fixed_cov,
   group_vars <- paste("Abundance ~", paste(fixed_cov, collapse = " + ")) %>%
     paste0(" + (1|", unit_var, ")") %>%
     stats::formula()
+  if (!requireNamespace("lmerTest", quietly = TRUE)) {
+    message("The 'lmerTest' package is not installed",
+            "Please install it from CRAN to use this function.")
+  }
   complex <- lmerTest::lmer(group_vars, data = filt_df,
                         na.action = stats::na.omit)
-  #confidence <- lme4::confint.merMod(complex, quiet = FALSE) %>%
-  #  as.data.frame() %>%
-  #  tibble::rownames_to_column("term")
-  sum_comp <- broom.mixed::tidy(complex) %>%
-    # dplyr::left_join(confidence, by = "term") %>%
-    dplyr::filter(is.na(.data$group)) %>%
-    dplyr::select(-"group")
+  if (requireNamespace("broom", quietly = TRUE) &&
+      requireNamespace("broom.mixed", quietly = TRUE)) {
+    sum_comp <- broom.mixed::tidy(complex) %>%
+      dplyr::filter(is.na(.data$group)) %>%
+      dplyr::select(-"group")
+  } else {
+    message("The 'broom' and/or 'broom.mixed' packages are not installed",
+            "Please install them to use this function.")
+  }
   
   if (plot_out) {
     plyr::a_ply(fixed_cov, 1, mk_gee_plot, complex = complex, tn = tn,
@@ -41,7 +47,9 @@ test_models_lmm <- function(tn, input_df, unit_var, fixed_cov,
 #' This function takes an animalcules-formatted \code{MultiAssayExperiment} and
 #' runs an independent LMM model for each taxon. The model predicts taxon log
 #' CPM abundance as a product of fixed-effects covariates with a random effect,
-#' usually the unit on which repeated measurements were taken.
+#' usually the unit on which repeated measurements were taken. Note, the 'broom',
+#' 'lmerTest', and 'broom.mixed' packages are required to use this function; they can
+#' be downloaded from CRAN.
 #'
 #' P-values are adjusted for the model coefficients within each taxon. The
 #' following methods are permitted: \code{c("holm", "hochberg", "hommel",
@@ -58,7 +66,7 @@ test_models_lmm <- function(tn, input_df, unit_var, fixed_cov,
 #' @examples
 #' dat <- system.file("extdata/MAE.RDS", package = "LegATo") |>
 #'   readRDS() |>
-#'   filter_animalcules_MAE(0.05)
+#'   filter_MAE(0.05)
 #' out <- run_lmm_model(dat, taxon_level = "genus", unit_var = "Subject",
 #'                      fixed_cov = c("HIVStatus", "timepoint"))
 #' head(out)

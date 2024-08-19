@@ -23,7 +23,7 @@ animalcules output.}
 
 \item{unit_var}{a numeric vector of subject.}
 
-\item{fixed_cov}{A character vector of covariates of interest found in
+\item{fixed_cov}{A character vector of the names of covariates of interest found in
 \code{dat}.}
 
 \item{covariate_time}{Character string giving the name of the discrete
@@ -68,7 +68,9 @@ group comparisons of microbial temporal interdependence. The NMIT test
 provides a comprehensive way to evaluate the association between key
 phenotypic variables and microbial interdependence. This function is
 recommended for use after a filtering step using
-\code{filter_animalcules_MAE}.
+\code{filter_MAE}. Note, the "ComplexHeatmap" package is required to
+use the plotting features of the function. The function requires the
+"vegan" package.
 }
 \examples{
 dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()

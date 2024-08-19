@@ -2,6 +2,10 @@
 mk_gee_plot <- function(this_coef, complex, tn, unit_var,
                         plotsave_loc, plot_terms, ...) {
   term_input <- unique(c(this_coef, plot_terms))
+  if (!requireNamespace("ggeffects", quietly = TRUE)) {
+    message("The 'ggeffects' package is not installed",
+            "Please install it from CRAN to use this function.")
+  }
   p <- plot(ggeffects::ggemmeans(complex, terms = term_input)) + 
     ggplot2::labs(subtitle = "Estimated marginal means",
                   title = stringr::str_replace(tn, "_", " ")) +
@@ -14,6 +18,10 @@ mk_gee_plot <- function(this_coef, complex, tn, unit_var,
 test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
                             corstr, plot_out,
                             plotsave_loc, plot_terms, ...) {
+  if (!requireNamespace("geepack", quietly = TRUE)) {
+    message("The 'geepack' package is not installed",
+            "Please install it from CRAN to use this function.")
+  }
   filt_df <- input_df %>% 
     dplyr::mutate("unit_var" = as.factor(input_df[, unit_var])) %>%
     dplyr::filter(.data$taxon == tn) %>%
@@ -23,7 +31,13 @@ test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
   complex <- geepack::geeglm(group_vars, id = unit_var, data = filt_df,
                              na.action = stats::na.omit, family = "gaussian",
                              corstr = corstr)
-  sum_comp <- broom::tidy(complex, conf.int = TRUE)
+  if (requireNamespace("broom", quietly = TRUE) &&
+      requireNamespace("broom.mixed", quietly = TRUE)) {
+    sum_comp <- broom::tidy(complex, conf.int = TRUE)
+  } else {
+    message("The 'broom' and/or 'broom.mixed' packages are not installed",
+            "Please install them to use this function.")
+  }
 
   if (plot_out) {
     plyr::a_ply(fixed_cov, 1, mk_gee_plot, complex = complex, tn = tn,
@@ -50,7 +64,9 @@ test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
 #' CPM abundance as a product of fixed-effects covariates conditional on a
 #' grouping ID variable, usually the unit on which repeated measurements were
 #' taken. This modeling approach works best with small datasets that multiple
-#' samples across many (>40) clusters/units.
+#' samples across many (>40) clusters/units. Note, the "broom", "ggeffects",
+#' "broom.mixed", "geepack" packages are required to use this
+#' function; all can be installed via CRAN.
 #'
 #' P-values are adjusted for the model coefficients within each taxon. The
 #' following methods are permitted: \code{c("holm", "hochberg", "hommel",

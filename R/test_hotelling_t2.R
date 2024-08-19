@@ -1,21 +1,29 @@
 # Helper function: unpaired multivariate Hotelling's t-squared
 
 .Hotelling_mv_T2_un <- function(input_data, Populations, Subjects,
-                                taxon = "taxon", save_table_loc) {
+                                taxon = "taxon", save_table_loc, num_taxa) {
   # Rename groups
   input_data <- input_data %>%
     dplyr::select("Populations" = dplyr::starts_with(Populations),
                   "Subjects" = dplyr::starts_with(Subjects),
                   "Taxon" = dplyr::starts_with(taxon),
                   "Abundance")
+  # Check that there is only one observation per group.
+  nonuniq_obs <- input_data %>%
+    dplyr::group_by(Populations, Subjects, Taxon) %>%
+    dplyr::summarize(count = dplyr::n(), .groups = "drop") %>%
+    dplyr::filter(count > 1) %>%
+    nrow()
+  if(nonuniq_obs > 0) message("More than one observation per unit/group detected") 
+  # Back to groups
   Group1 <- unique(input_data$Populations)[1]
   Group2 <- unique(input_data$Populations)[2]
   Sub1 <- input_data %>% dplyr::filter(.data$Populations == Group1) %>% 
     dplyr::distinct(.data$Subjects) %>% dplyr::ungroup() %>% 
-    dplyr::select(.data$Subjects) %>% unlist()
+    dplyr::select("Subjects") %>% unlist()
   Sub2 <- input_data %>% dplyr::filter(.data$Populations == Group2) %>% 
     dplyr::distinct(.data$Subjects) %>% dplyr::ungroup() %>%
-    dplyr::select(.data$Subjects) %>% unlist()
+    dplyr::select("Subjects") %>% unlist()
   # Define n
   n <- input_data %>% dplyr::group_by(Populations) %>%
     dplyr::distinct(Subjects) %>% dplyr::summarize("n_col" = dplyr::n())
@@ -24,17 +32,21 @@
   n2 <- n %>% dplyr::filter(Populations == Group2) %>%
     dplyr::select("n_col") %>% as.numeric()
   p <- length(unique(input_data$Taxon))
+  # Check that it won't be singular
+  # (n1 + n2 - num_taxa - 1) < 1
+  num_taxa_min <- n1 + n2 - 2
+  if (num_taxa > num_taxa_min) stop("num_taxa must be no larger than ", num_taxa_min)
   # Sample mean vector
   X_i <- input_data %>%
     dplyr::rename("Xi" = "Abundance")
   Xbar <- X_i %>%
     dplyr::group_by(.data$Populations, .data$Taxon) %>%
-    dplyr::summarise("Xbar" = mean(.data$Xi), .groups = "drop")
+    dplyr::reframe(Xbar = mean(.data$Xi))
   # X_i - Xbar
   diff <- X_i %>%
     dplyr::left_join(., Xbar, by = c("Populations", "Taxon")) %>%
     dplyr::group_by(.data$Subjects, .data$Taxon) %>%
-    dplyr::summarise("diff" = .data$Xi - .data$Xbar, .groups = "drop")
+    dplyr::reframe("diff" = .data$Xi - .data$Xbar)
   # (X_ij-Xbar_i)%*%(X_ij-Xbar_i)'
   mult_func <- function(x) {
     vec <- t(t(diff$diff[diff$Subjects == x]))
@@ -65,8 +77,8 @@
     ttest_unpaired <- function(tax) {
       for_testing <- input_data %>% dplyr::filter(.data$Taxon == tax)
       out_test <- stats::t.test(stats::formula("Abundance ~ Populations"), for_testing,
-                         alternative = "two.sided",
-                         var.equal = FALSE, paired = FALSE)
+                                alternative = "two.sided",
+                                var.equal = FALSE, paired = FALSE)
       return(list(t = out_test$statistic, df = out_test$parameter,
                   diff_means = out_test$estimate[1],
                   CI_2.5 = out_test$conf.int[1],
@@ -76,7 +88,7 @@
     results <- plyr::aaply(unique(input_data$Taxon), 1, ttest_unpaired)
     results <- rbind(results,
                      "adj p-value" = stats::p.adjust(results["p-value", ],
-                                              method = "bonferroni"))
+                                                     method = "bonferroni"))
     # Write results
     filename_out <- paste0("ttest_results", Group1, Group2, ".csv")
     utils::write.csv(results, file.path(save_table_loc, filename_out))
@@ -87,8 +99,6 @@
        "F_stat" = F_stat[1], "pvalue" = pval)
 }
 
-
-
 # Helper function: Paired Multivariate Hotelling's T-Squared Test
 
 .Hotelling_mv_T2 <- function(input, Group1, Group2, save_table_loc){
@@ -97,10 +107,20 @@
                                         "Taxon" = "taxon",
                                         "Group1" = tidyr::starts_with(Group1),
                                         "Group2" = tidyr::starts_with(Group2))
+  # Check that there is only one observation per group.
+  nonuniq_obs <- input_data %>%
+    dplyr::group_by(pairing, Taxon) %>%
+    dplyr::summarize(count = dplyr::n(), .groups = "drop") %>%
+    dplyr::filter(count > 1) %>%
+    nrow()
+  if(nonuniq_obs > 0) message("More than one observation per unit/group detected")
   # Define n
   all_pairs <- unique(input_data$pairing)
   n <- length(all_pairs)
   p <- length(unique(input_data$Taxon))
+  # Check that it won't be singular
+  # n - p < 1
+  if (n - p < 1) stop("num_taxa must be no larger than ", n - 1)
   # Sample mean vector
   Y_i <- input_data %>%
     dplyr::group_by(.data$pairing, .data$Taxon) %>%
@@ -142,9 +162,9 @@
     ttest_paired <- function(tax) {
       for_testing <- input_data %>% dplyr::filter(.data$Taxon == tax)
       out_test <- stats::t.test(x = for_testing$Group1,
-                         y = for_testing$Group2,
-                         alternative = "two.sided",
-                         paired = TRUE, var.equal = TRUE)
+                                y = for_testing$Group2,
+                                alternative = "two.sided",
+                                paired = TRUE, var.equal = TRUE)
       output <- list("t" = as.numeric(out_test$statistic),
                      "df" = as.numeric(out_test$parameter),
                      "diff_means" = as.numeric(out_test$estimate),
@@ -154,12 +174,12 @@
       return(lapply(output, base::round, digits = 4))
     }
     results <- plyr::aaply(unique(input_data$Taxon), 1, ttest_paired)
-    results <- rbind(results, "adj p-value" = stats::p.adjust(results["p-value", ],
-                                                       method = "bonferroni"))
+    results_2 <- cbind(results, "adj p-value" = stats::p.adjust(results[, "p-value"],
+                                                                method = "bonferroni"))
     # Write results
     filename_out <- paste0("ttest_results", Group1, Group2, ".csv")
-    utils::write.csv(results, file.path(save_table_loc, filename_out))
-    message("Results from t-tests written to", filename_out)
+    utils::write.csv(results_2, file.path(save_table_loc, filename_out))
+    message("Results from t-tests written to ", filename_out)
   }
   
   return(list("df1" = df1, "df2" = df2, "crit_F" = crit_F,
@@ -221,7 +241,7 @@
 #' @examples
 #' dat <- system.file("extdata", "MAE.RDS", package = "LegATo") |>
 #' readRDS()
-#' dat_0.05 <- filter_animalcules_MAE(dat, 0.05)
+#' dat_0.05 <- filter_MAE(dat, 0.05)
 #' out1 <- test_hotelling_t2(dat = dat_0.05,
 #'                   test_index = which(dat_0.05$MothChild == "Infant" &
 #'                                        dat_0.05$timepoint == 6),
@@ -267,19 +287,24 @@ test_hotelling_t2 <- function(dat,
       dplyr::select(dplyr::all_of(c(grouping_var, pairing_var)), "taxon",
                     "Abundance") %>%
       tidyr::pivot_wider(., id_cols = dplyr::all_of(c("taxon", pairing_var)),
-                         values_from = .data$Abundance,
+                         values_from = "Abundance",
                          names_from = dplyr::all_of(grouping_var)) %>%
       dplyr::arrange(.data$pairing) %>%
       dplyr::filter(!dplyr::if_any(tidyselect::everything(), is.na))
-    results <- .Hotelling_mv_T2(output_data, "HIV", "Control", save_table_loc)
+    # Ensure dichotomous
+    all_vars <- unique(input_data[, grouping_var])
+    if(length(all_vars) != 2) {
+      stop("grouping_var must be dichotomous")
+    } else results <- .Hotelling_mv_T2(output_data, all_vars[1],
+                                       all_vars[2], save_table_loc)
   } else {
     if (is.null(unit_var)) message("Please supply unit_var if paired = FALSE")
     output_data <- input_data %>%
-      dplyr::select("taxon", "Subject", dplyr::all_of(c(grouping_var)), "Abundance") %>%
-      dplyr::arrange(.data$Subject) %>%
+      dplyr::select("taxon", dplyr::all_of(c(unit_var, grouping_var)), "Abundance") %>%
+      dplyr::arrange(.data[[unit_var]]) %>%
       dplyr::filter(!dplyr::if_any(tidyselect::everything(), is.na))
     results <- .Hotelling_mv_T2_un(output_data, grouping_var, unit_var, "taxon",
-                                   save_table_loc)
+                                   save_table_loc, num_taxa)
   }
   return(results)
 }

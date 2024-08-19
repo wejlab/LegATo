@@ -6,11 +6,14 @@ test_models_lm <- function(tn, input_df, fixed_cov,
     stats::formula()
   complex <- stats::lm(group_vars, data = filt_df,
                        na.action = stats::na.omit)
-  #confidence <- lme4::confint.merMod(complex, quiet = FALSE) %>%
-  #  as.data.frame() %>%
-  #  tibble::rownames_to_column("term")
-  sum_comp <- broom.mixed::tidy(complex)
-    # dplyr::left_join(confidence, by = "term")
+  
+  if (requireNamespace("broom", quietly = TRUE) &&
+      requireNamespace("broom.mixed", quietly = TRUE)) {
+    sum_comp <- broom.mixed::tidy(complex)
+  } else {
+    message("The 'broom' and/or 'broom.mixed' packages are not installed",
+            "Please install them to use this function.")
+  }
   
   if (plot_out) {
     plyr::a_ply(fixed_cov, 1, mk_gee_plot, complex = complex, tn = tn,
@@ -20,8 +23,6 @@ test_models_lm <- function(tn, input_df, fixed_cov,
     dplyr::mutate("Taxon" = tn) %>%
     dplyr::rename("Coefficient" = "term",
                   "Coefficient Estimate" = "estimate",
-                  #              "Lower 95% CI" = "2.5 %",
-                  #              "Upper 95% CI" = "97.5 %",
                   "Standard Error" = "std.error",
                   "Statistic" = "statistic",
                   "Unadj p-value" = "p.value") %>%
@@ -35,6 +36,9 @@ test_models_lm <- function(tn, input_df, fixed_cov,
 #' runs an independent linear model for each taxon. The model predicts taxon log
 #' CPM abundance as a product of user-specified covariates. This model can
 #' be used for general microbiome analyses without repeated measures data.
+#' Note, the "broom", and
+#' "broom.mixed" packages are required to use the testing functionality of this
+#' package; both can be installed via CRAN.
 #'
 #' P-values are adjusted for the model coefficients within each taxon. The
 #' following methods are permitted: \code{c("holm", "hochberg", "hommel",

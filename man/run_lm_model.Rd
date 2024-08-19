@@ -44,6 +44,9 @@ This function takes an animalcules-formatted \code{MultiAssayExperiment} and
 runs an independent linear model for each taxon. The model predicts taxon log
 CPM abundance as a product of user-specified covariates. This model can
 be used for general microbiome analyses without repeated measures data.
+Note, the "broom", and
+"broom.mixed" packages are required to use the testing functionality of this
+package; both can be installed via CRAN.
 }
 \details{
 P-values are adjusted for the model coefficients within each taxon. The

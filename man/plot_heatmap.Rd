@@ -106,9 +106,10 @@ such that column order is automatically determined via clustering.}
 A ComplexHeatmap plot.
 }
 \description{
-This function takes an arbitrary dataset as an input
-and returns a \code{ComplexHeatmap} plot. The function takes arguments listed here as well
-as any others to be passed on to \code{ComplexHeatmap::Heatmap()}.
+This function takes an arbitrary dataset as an input and returns a
+\code{ComplexHeatmap} plot. The function takes arguments listed here as well
+as any others to be passed on to \code{ComplexHeatmap::Heatmap()}. Note, the
+"circlize" and "ComplexHeatmap" packages are required to use this function.
 }
 \details{
 If both \code{annotationData = NULL} and \code{annotationColNames = NULL},

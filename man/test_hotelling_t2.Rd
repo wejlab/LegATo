@@ -78,7 +78,7 @@ https://online.stat.psu.edu/stat505/lesson/7/7.1/7.1.9
 \examples{
 dat <- system.file("extdata", "MAE.RDS", package = "LegATo") |>
 readRDS()
-dat_0.05 <- filter_animalcules_MAE(dat, 0.05)
+dat_0.05 <- filter_MAE(dat, 0.05)
 out1 <- test_hotelling_t2(dat = dat_0.05,
                   test_index = which(dat_0.05$MothChild == "Infant" &
                                        dat_0.05$timepoint == 6),

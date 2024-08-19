@@ -21,10 +21,10 @@ utils::globalVariables(".")
 #'
 #' @examples
 #' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
-#' filter_animalcules_MAE(in_dat, 0.01)
+#' filter_MAE(in_dat, 0.01)
 #' 
 
-filter_animalcules_MAE <- function(dat, filter_prop = 0.001) {
+filter_MAE <- function(dat, filter_prop = 0.001) {
   if(filter_prop <= 0 | filter_prop >= 1) stop("filter_prop must be between 0 and 1.")
   # Extract metadata, taxonomic info, and counts
   parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")

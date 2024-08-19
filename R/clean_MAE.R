@@ -1,7 +1,7 @@
 #' Clean up taxon names in a MultiAssayExperiment
 #'
 #' This functional is an optional method for fixing up taxon names in a
-#' \code{MultiAssayExperiment} to be run before \code{filter_animalcules_MAE}.
+#' \code{MultiAssayExperiment} to be run before \code{filter_MAE}.
 #' Specifically it removes brackets from species names, replaces species labeled
 #' as "others" with "sp." and finally replaces underscores with spaces.
 #'
@@ -15,10 +15,10 @@
 #'
 #' @examples
 #' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
-#' clean_animalcules_MAE(in_dat)
+#' clean_MAE(in_dat)
 #' 
 
-clean_animalcules_MAE <- function(dat) {
+clean_MAE <- function(dat) {
   # Extract data
   parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
   tax_table <- parsed$tax

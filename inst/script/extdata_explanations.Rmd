@@ -80,7 +80,7 @@ rownames(sample_table) <- sample_table$Sample
 
 # Tax table
 data_in_2 <- system.file("extdata/MAE.RDS", package = "LegATo") %>%
-  readRDS() %>% filter_animalcules_MAE(0.02)
+  readRDS() %>% filter_MAE(0.02)
 tax_dat_pre <- parse_MAE_SE(data_in_2)$tax
 ind <- sample(seq_len(nrow(tax_dat_pre)), 100)
 tax_dat <- tax_dat_pre[ind, ] %>%

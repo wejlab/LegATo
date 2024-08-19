@@ -19,7 +19,7 @@
 #'
 #' @author Yilong Zhang, Huilin Li, Aubrey Odom
 #'
-#' @inheritParams clean_animalcules_MAE
+#' @inheritParams clean_MAE
 #' @param method an option of the correlation method ("pearson", "kendall",
 #'   "spearman"). The default method is "kendall".
 #' @param unit_var a numeric vector of subject.
@@ -69,13 +69,15 @@ tscor <- function(dat, unit_var, method = "kendall", fill_na = 0) {
 #' provides a comprehensive way to evaluate the association between key
 #' phenotypic variables and microbial interdependence. This function is
 #' recommended for use after a filtering step using
-#' \code{filter_animalcules_MAE}.
+#' \code{filter_MAE}. Note, the "ComplexHeatmap" package is required to
+#' use the plotting features of the function. The function requires the
+#' "vegan" package.
 #'
 #' @author Yilong Zhang, Huilin Li, Aubrey Odom
 #'
 #' @inheritParams tscor
 #' @inheritParams plot_stacked_bar
-#' @param fixed_cov A character vector of covariates of interest found in
+#' @param fixed_cov A character vector of the names of covariates of interest found in
 #'   \code{dat}.
 #' @param dist_type A character string specifying the type of matrix norm to be
 #'   computed. The default is \code{"F"}.
@@ -115,6 +117,11 @@ NMIT <- function(dat, unit_var, fixed_cov,
                  heatmap = TRUE, classify = FALSE,
                  fill_na = 0,
                  ...) {
+  # Ensure that vegan is installed
+  if (!requireNamespace("vegan", quietly = TRUE)) {
+    message("The 'vegan' package is not installed",
+            "Please install it from CRAN to use this function.")
+  }
   dat <- .rearrange_sub_time(dat, unit_var, covariate_time) 
   all_dat <- parse_MAE_SE(dat)
   map <- all_dat$sam
@@ -133,9 +140,20 @@ NMIT <- function(dat, unit_var, fixed_cov,
                 })
   rownames(dist) <- dimnames(otu.cor)[[3]]
   colnames(dist) <- dimnames(otu.cor)[[3]]
-  grp <- map.unique[rownames(dist), fixed_cov]
-  test <- vegan::adonis2(dist ~ grp)
+  if (length(fixed_cov) > 1) {
+    grp <- map.unique[rownames(dist), fixed_cov]
+  } else {
+    grp <- map.unique[rownames(dist), fixed_cov] %>%
+      as.data.frame() %>% magrittr::set_colnames(fixed_cov)
+  }
+  adonis_formula <- as.formula(paste("dist ~", paste(names(grp), collapse = " + ")))
+  test <- vegan::adonis2(adonis_formula, data = grp)
   if(heatmap){
+    # Ensure that ComplexHeatmap is installed
+    if (!requireNamespace("ComplexHeatmap", quietly = TRUE)) {
+      message("The 'ComplexHeatmap' package is not installed",
+              "Please install it from CRAN to use this function.")
+    }
     pvalue <- round(c(test$`Pr(>F)`[1]), 3)
     n.taxa <- nrow(otu)
     

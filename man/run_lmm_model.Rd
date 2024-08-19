@@ -48,7 +48,9 @@ A \code{data.frame} of modeling results.
 This function takes an animalcules-formatted \code{MultiAssayExperiment} and
 runs an independent LMM model for each taxon. The model predicts taxon log
 CPM abundance as a product of fixed-effects covariates with a random effect,
-usually the unit on which repeated measurements were taken.
+usually the unit on which repeated measurements were taken. Note, the 'broom',
+'lmerTest', and 'broom.mixed' packages are required to use this function; they can
+be downloaded from CRAN.
 }
 \details{
 P-values are adjusted for the model coefficients within each taxon. The
@@ -58,7 +60,7 @@ following methods are permitted: \code{c("holm", "hochberg", "hommel",
 \examples{
 dat <- system.file("extdata/MAE.RDS", package = "LegATo") |>
   readRDS() |>
-  filter_animalcules_MAE(0.05)
+  filter_MAE(0.05)
 out <- run_lmm_model(dat, taxon_level = "genus", unit_var = "Subject",
                      fixed_cov = c("HIVStatus", "timepoint"))
 head(out)

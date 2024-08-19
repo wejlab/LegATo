@@ -27,8 +27,8 @@ reference:
     desc: "Create, clean, and filter a MultiAssayExperiment object."
     contents:
     - create_formatted_MAE
-    - clean_animalcules_MAE
-    - filter_animalcules_MAE
+    - clean_MAE
+    - filter_MAE
   - title: "Reformat a MAE Object into a Data Frame"
     desc: "Take a animalcules-formatted MAE and reformat for visualizationa and analysis."
     contents:
