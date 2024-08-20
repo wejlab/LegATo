@@ -107,7 +107,8 @@ A ComplexHeatmap plot.
 }
 \description{
 This function takes an arbitrary dataset as an input and returns a
-\code{ComplexHeatmap} plot. The function takes arguments listed here as well
+\code{ComplexHeatmap} plot of samples based on similarity of microbial
+abundances. The function takes arguments listed here as well
 as any others to be passed on to \code{ComplexHeatmap::Heatmap()}. Note, the
 "circlize" and "ComplexHeatmap" packages are required to use this function.
 }

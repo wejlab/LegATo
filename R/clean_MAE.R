@@ -2,7 +2,7 @@
 #'
 #' This functional is an optional method for fixing up taxon names in a
 #' \code{MultiAssayExperiment} to be run before \code{filter_MAE}.
-#' Specifically it removes brackets from species names, replaces species labeled
+#' Specifically, it removes brackets from species names, replaces species labeled
 #' as "others" with "sp." and finally replaces underscores with spaces.
 #'
 #' @inheritParams plot_stacked_bar
@@ -16,7 +16,7 @@
 #' @examples
 #' in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
 #' clean_MAE(in_dat)
-#' 
+#'
 
 clean_MAE <- function(dat) {
   # Extract data

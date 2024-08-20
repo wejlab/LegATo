@@ -68,7 +68,8 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
 #' Plot a ComplexHeatmap.
 #'
 #' This function takes an arbitrary dataset as an input and returns a
-#' \code{ComplexHeatmap} plot. The function takes arguments listed here as well
+#' \code{ComplexHeatmap} plot of samples based on similarity of microbial
+#' abundances. The function takes arguments listed here as well
 #' as any others to be passed on to \code{ComplexHeatmap::Heatmap()}. Note, the
 #' "circlize" and "ComplexHeatmap" packages are required to use this function.
 #'
@@ -147,7 +148,35 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
 #' @export
 #'@examples
 #' library(SummarizedExperiment)
-#' # Generate some artificial data that shows a difference in Zak_RISK_16
+#' # Example with a Summarized Experiment data object
+#' dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
+#' input_SE <- dat[["MicrobeGenetics"]]
+#' 
+#' ## Creating a continuous color ramp annot col list
+#' Hairrange <- range(colData(input_SE)[, "HairLength"])
+#' color2 <- circlize::colorRamp2(c(Hairrange[1], Hairrange[2]), c("blue", "red"))
+#' color.list <- list("HairLength" = color2)
+#' 
+#' ## Create plot
+#' plot_heatmap(
+#'   inputData = input_SE,
+#'   name = "Microbe abundances",
+#'   plot_title = "Example Heatmap",
+#'   plottingColNames = colnames(input_SE),
+#'   annotationColNames = "HairLength",
+#'   colList = color.list,
+#'   scale = TRUE,
+#'   showColumnNames = TRUE,
+#'   showRowNames = FALSE,
+#'   colorSets = 
+#'     c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Accent", "Dark2",
+#'       "Paired"),
+#'   choose_color = c("blue", "gray95", "red"),
+#'   split_heatmap = "none",
+#'   column_order = NULL
+#' )
+#' 
+#' # Artificial data example - matrix input
 #' mat_testdata <- rbind(matrix(c(rnorm(80), rnorm(80) + 5), 16, 10,
 #'                              dimnames = list(paste0("Taxon", seq_len(16)),
 #'                                              paste0("sample", seq_len(10)))),
@@ -180,6 +209,8 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
 #' )
 #'
 
+# Plotting colnames should not be in colData...
+
 plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
                          name = "Input data",
                          plottingColNames,
@@ -204,15 +235,17 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
     if (any(duplicated(plottingColNames))) {
       stop("Duplicate plotting column name is not supported.")
     }
-    if (!all(plottingColNames %in% colnames(SummarizedExperiment::colData(inputData)))) {
-      stop("plotting column name not found in inputData.")
+    if (!all(plottingColNames %in% colnames(inputData))) {
+      stop("Plotting column name(s) not found in inputData.")
     }
     if (!is.null(annotationColNames)) {
       if (!all(annotationColNames %in% colnames(SummarizedExperiment::colData(inputData)))) {
         stop("Annotation column name not found in inputData.")
       }
-      annotationData <- SummarizedExperiment::colData(inputData)[, annotationColNames, drop = FALSE]
-      inputData <- SummarizedExperiment::colData(inputData)[, plottingColNames, drop = FALSE]
+      annotationData <- SummarizedExperiment::colData(inputData)[, annotationColNames, drop = FALSE] %>%
+        as.data.frame()
+      inputData <- parse_MAE_SE(
+        inputData, type = "SE")$counts[, plottingColNames, drop = FALSE]
     }
   } else {
     if (is.null(annotationData)) {
@@ -221,21 +254,20 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
       annotationColNames <- colnames(annotationData)
     }
   }
-  if (!is.null(annotationData)) {
-    if (nrow(annotationData) == nrow(inputData)) {
-      if (!all(rownames(annotationData) == rownames(inputData))) {
-        stop("Annotation data and plotting data does not match.")
-      }
-    } else if (nrow(annotationData) == ncol(inputData)) {
-      if (!all(rownames(annotationData) == colnames(inputData))) {
-        stop("Annotation data and plotting data does not match.")
-      }
-      inputData <- t(inputData)
-    } else {
+  if (nrow(annotationData) == nrow(inputData)) {
+    if (!all(rownames(annotationData) == rownames(inputData))) {
       stop("Annotation data and plotting data does not match.")
     }
+  } else if (nrow(annotationData) == ncol(inputData)) {
+    if (!all(rownames(annotationData) == colnames(inputData))) {
+      stop("Annotation data and plotting data does not match.")
+    }
+    # inputData <- t(inputData)
+  } else {
+    stop("Annotation data and plotting data does not match.")
   }
-  sigresults <- t(as.matrix(inputData))
+  # Transpose so sample names are on the columns
+  sigresults <- inputData
   if (scale) {
     sigresults <- t(scale(t(sigresults)))
   }
@@ -247,62 +279,60 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
     }
   }
   ann_data <- annotationplotting[annotationplotting[, 1] %in%
-                                    plottingColNames, ]
+                                   plottingColNames, ]
   if (split_heatmap == "none") {
     row_split_pass <- c()
   } else {
     row_split_pass <- ann_data[, split_heatmap]
   }
-  if (!is.null(annotationData)) {
-    if (length(colList) == 0) {
-      colorSetNum <- 1
-      for (annot in annotationColNames) {
-        if (is.numeric(annotationData[, annot])) {
-          t1min <- min(annotationData[, annot], na.rm = TRUE)
-          t1max <- max(annotationData[, annot], na.rm = TRUE)
-          if (requireNamespace("circlize", quietly = TRUE)) {
-            colList[[annot]] <- circlize::colorRamp2(c(t1min, t1max),
-                                                     c("white", "blue"))
-          } else {
-            message("The 'circlize' package is not installed",
+  if (length(colList) == 0) {
+    colorSetNum <- 1
+    for (annot in annotationColNames) {
+      if (is.numeric(annotationData[, annot])) {
+        t1min <- min(annotationData[, annot], na.rm = TRUE)
+        t1max <- max(annotationData[, annot], na.rm = TRUE)
+        if (requireNamespace("circlize", quietly = TRUE)) {
+          colList[[annot]] <- circlize::colorRamp2(c(t1min, t1max),
+                                                   c("white", "blue"))
+        } else {
+          message("The 'circlize' package is not installed",
+                  "Please install it from CRAN to use this function.")
+        }
+      } else {
+        if (is.factor(annotationData[, annot][!is.na(annotationData[, annot])])) {
+          condLevels <- levels(annotationData[, annot][!is.na(annotationData[, annot])])
+        } else {
+          condLevels <- unique(annotationData[, annot][!is.na(annotationData[, annot])])
+        }
+        if (length(condLevels) > 8) {
+          colors <- distinctColors(length(condLevels))
+        } else {
+          if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
+            message("The 'RColorBrewer' package is not installed",
                     "Please install it from CRAN to use this function.")
           }
-        } else {
-          if (is.factor(annotationData[, annot][!is.na(annotationData[, annot])])) {
-            condLevels <- levels(annotationData[, annot][!is.na(annotationData[, annot])])
-          } else {
-            condLevels <- unique(annotationData[, annot][!is.na(annotationData[, annot])])
-          }
-          if (length(condLevels) > 8) {
-            colors <- distinctColors(length(condLevels))
-          } else {
-            if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
-              message("The 'RColorBrewer' package is not installed",
-                      "Please install it from CRAN to use this function.")
-            }
-            colors <- RColorBrewer::brewer.pal(8, colorSets[colorSetNum])
-            colorSetNum <- colorSetNum + 1
-          }
-          colList[[annot]] <- stats::setNames(colors[seq_along(condLevels)],
-                                              condLevels)
+          colors <- RColorBrewer::brewer.pal(8, colorSets[colorSetNum])
+          colorSetNum <- colorSetNum + 1
         }
+        colList[[annot]] <- stats::setNames(colors[seq_along(condLevels)],
+                                            condLevels)
       }
     }
-    topha2 <- ComplexHeatmap::HeatmapAnnotation(
-      df = data.frame(annotationData),
-      col = colList, height = grid::unit(0.4 * length(annotationColNames), "cm"),
-      show_legend = TRUE, show_annotation_name = TRUE)
-    return(ComplexHeatmap::draw(
-      ComplexHeatmap::Heatmap(sigresults, column_title = plot_title,
-                              name = name,
-                              show_column_names = showColumnNames,
-                              col = choose_color,
-                              show_row_names = showRowNames,
-                              top_annotation = topha2,
-                              row_split = row_split_pass,
-                              column_order = column_order,
-                              cluster_columns = TRUE,
-                              ...),
-      annotation_legend_side = "bottom"))
   }
+  topha2 <- ComplexHeatmap::HeatmapAnnotation(
+    df = data.frame(annotationData),
+    col = colList, height = grid::unit(0.4 * length(annotationColNames), "cm"),
+    show_legend = TRUE, show_annotation_name = TRUE)
+  ComplexHeatmap::draw(
+    ComplexHeatmap::Heatmap(sigresults, column_title = plot_title,
+                            name = name,
+                            show_column_names = showColumnNames,
+                            col = choose_color,
+                            show_row_names = showRowNames,
+                            top_annotation = topha2,
+                            row_split = row_split_pass,
+                            column_order = column_order,
+                            cluster_columns = TRUE, ...),
+    annotation_legend_side = "bottom")
+  return()
 }

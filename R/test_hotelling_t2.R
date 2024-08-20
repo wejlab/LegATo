@@ -215,9 +215,10 @@
 #' @param test_index Any argument used for subsetting the input \code{dat},
 #' can be a character, logical, integer, list or List vector. Default is \code{NULL}.
 #' @param taxon_level Character string, default is \code{"genus"}.
-#' @param num_taxa The number of most abundant taxa to test. Needs to be small enough to
-#' avoid n > p issues where n is the smallest number of samples or units in a given group,
-#' and p is the number of microbes to be tested.
+#' @param num_taxa The number of most abundant taxa to test. If unpaired, this should
+#' be no larger than the total number of subjects in both groups - 2, or (n1 + n2 -2).
+#' If paired, this should be no larger than the total number of pairs - 1, or n - 1.
+#' Required.
 #' @param grouping_var Character string, the name of a DICHOTOMOUS grouping variable in the
 #' metadata of \code{dat}.
 #' @param paired Logical indicating whether a paired test should be conducted.
@@ -246,7 +247,6 @@
 #'                   test_index = which(dat_0.05$MothChild == "Infant" &
 #'                                        dat_0.05$timepoint == 6),
 #'                   taxon_level = "genus",
-#'                   # To avoid n < p, use top 5-6 species
 #'                   num_taxa = 6,
 #'                   paired = TRUE,
 #'                   grouping_var = "HIVStatus",
@@ -257,7 +257,6 @@
 #'                   test_index = which(dat_0.05$MothChild == "Mother" &
 #'                                        dat_0.05$timepoint == 0),
 #'                   taxon_level = "genus",
-#'                   # To avoid n < p, use top 5-6 species
 #'                   num_taxa = 12,
 #'                   grouping_var = "HIVStatus",
 #'                   unit_var = "Subject",
