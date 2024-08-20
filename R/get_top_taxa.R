@@ -20,11 +20,11 @@
 get_top_taxa <- function(dat, taxon_level = "genus") {
   microbe <- parse_MAE_SE(dat)
   all_relabu <- microbe$counts |>
-    animalcules::upsample_counts(microbe$tax, taxon_level)%>%
+    animalcules::upsample_counts(microbe$tax, taxon_level) %>%
     animalcules::counts_to_relabu() %>%
     tibble::rownames_to_column(var = "taxon") |>
-    dplyr::rowwise(.data$taxon) |>
-    # Sum everything but the first columm ("genus")
+    dplyr::rowwise("taxon") |>
+    # Sum everything but the first columm (taxon name)
     dplyr::summarise(
       allmeans = mean(
         dplyr::c_across(dplyr::all_of(colnames(microbe$counts)))),

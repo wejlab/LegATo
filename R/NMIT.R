@@ -81,16 +81,14 @@ tscor <- function(dat, unit_var, method = "kendall", fill_na = 0) {
 #'   \code{dat}.
 #' @param dist_type A character string specifying the type of matrix norm to be
 #'   computed. The default is \code{"F"}.
-#' \itemize{
-#'     \item{\code{"M"} or \code{"m"}}{specifies the maximum modulus of all the
-#'     elements in \code{x}.}
-#'     \item{\code{"O"}, \code{"o"} or \code{"1"}}{specifies the one norm,
-#'     (maximum absolute column sum);}
-#'     \item{\code{"I"} or \code{"i"}}{specifies the infinity norm (maximum
-#'     absolute row sum);}
-#'     \item{\code{"F"} or \code{"f"}}{specifies the Frobenius norm (the
-#'     Euclidean norm of \code{x} treated as if it were a vector)}
-#' }  
+#'   * \code{"M"} or \code{"m"} specifies the maximum modulus of all the
+#'     elements in \code{x};
+#'   * \code{"O"}, \code{"o"} or \code{"1"} specifies the one norm,
+#'     (maximum absolute column sum);
+#'   * \code{"I"} or \code{"i"} specifies the infinity norm (maximum
+#'     absolute row sum);
+#'   * \code{"F"} or \code{"f"} specifies the Frobenius norm (the
+#'     Euclidean norm of \code{x} treated as if it were a vector)
 #' @param heatmap A logical value indicating whether to draw heatmap. The
 #'   default is \code{TRUE}.
 #' @param classify A logical value indicating whether to draw a classifier tree.
@@ -130,8 +128,8 @@ NMIT <- function(dat, unit_var, fixed_cov,
   rownames(map.unique) <- map.unique[, unit_var]
   n.sample <- length(unique(map[, unit_var]))
   otu.cor <- tscor(dat, method = method,
-                   unit_var = unit_var, fill_na = fill_na) |>
-    suppressWarnings()
+                   unit_var = unit_var, fill_na = fill_na) # |>
+    # suppressWarnings()
   dist <- outer(seq_len(n.sample), seq_len(n.sample),
                 function(x,y) {
                   foo <- function(x,y) norm(otu.cor[, , x] - otu.cor[, , y],
@@ -146,7 +144,7 @@ NMIT <- function(dat, unit_var, fixed_cov,
     grp <- map.unique[rownames(dist), fixed_cov] %>%
       as.data.frame() %>% magrittr::set_colnames(fixed_cov)
   }
-  adonis_formula <- as.formula(paste("dist ~", paste(names(grp), collapse = " + ")))
+  adonis_formula <- stats::as.formula(paste("dist ~", paste(names(grp), collapse = " + ")))
   test <- vegan::adonis2(adonis_formula, data = grp)
   if(heatmap){
     # Ensure that ComplexHeatmap is installed

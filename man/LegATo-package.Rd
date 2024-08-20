@@ -8,6 +8,14 @@
 \description{
 LegATo is a suite of open-source software tools for longitudinal microbiome analysis. It is extendable to several different study forms with optimal ease-of-use for researchers. Microbiome time-series data presents distinct challenges including complex covariate dependencies and variety of longitudinal study designs. This toolkit will allow researchers to determine which microbial taxa are affected over time by perturbations such as onset of disease or lifestyle choices, and to predict the effects of these perturbations over time, including changes in composition or stability of commensal bacteria.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://wejlab.github.io/LegATo-docs/}
+  \item Report bugs at \url{https://github.com/wejlab/LegATo/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Aubrey Odom \email{aodom@bu.edu} (\href{https://orcid.org/0000-0001-7113-7598}{ORCID})
 

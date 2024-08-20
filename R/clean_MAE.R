@@ -26,9 +26,8 @@ clean_MAE <- function(dat) {
   # Preliminary fixing of species names
   if(!all(c("genus", "species") %in% colnames(tax_table))) {
     stop("Columns 'genus' and 'species' must be present in taxonomy table.")
-  }
-  if(!all.equal(rownames(tax_table), rownames(counts_table))) {
-    stop("Error in parsing MAE")
+  } else if(!all.equal(rownames(tax_table), rownames(counts_table))) {
+    stop("MAE could not be parsed correctly. Please ensure correct formatting.")
   }
   # Only need to alter species names in tax_table initially
   se_rowData  <- tax_table %>%

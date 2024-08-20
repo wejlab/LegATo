@@ -10,9 +10,9 @@
                   "Abundance")
   # Check that there is only one observation per group.
   nonuniq_obs <- input_data %>%
-    dplyr::group_by(Populations, Subjects, Taxon) %>%
-    dplyr::summarize(count = dplyr::n(), .groups = "drop") %>%
-    dplyr::filter(count > 1) %>%
+    dplyr::group_by(.data$Populations, .data$Subjects, .data$Taxon) %>%
+    dplyr::summarize("count" = dplyr::n(), .groups = "drop") %>%
+    dplyr::filter(.data$count > 1) %>%
     nrow()
   if(nonuniq_obs > 0) message("More than one observation per unit/group detected") 
   # Back to groups
@@ -109,9 +109,9 @@
                                         "Group2" = tidyr::starts_with(Group2))
   # Check that there is only one observation per group.
   nonuniq_obs <- input_data %>%
-    dplyr::group_by(pairing, Taxon) %>%
-    dplyr::summarize(count = dplyr::n(), .groups = "drop") %>%
-    dplyr::filter(count > 1) %>%
+    dplyr::group_by(.data$pairing, .data$Taxon) %>%
+    dplyr::summarize("count" = dplyr::n(), .groups = "drop") %>%
+    dplyr::filter(.data$count > 1) %>%
     nrow()
   if(nonuniq_obs > 0) message("More than one observation per unit/group detected")
   # Define n
@@ -134,7 +134,7 @@
   diff <- Y_i %>%
     dplyr::left_join(., Ybar, by = "Taxon") %>%
     dplyr::group_by(.data$pairing, .data$Taxon) %>%
-    dplyr::summarise(diff = .data$Yi - .data$Ybar, .groups = "drop")
+    dplyr::summarise("diff" = .data$Yi - .data$Ybar, .groups = "drop")
   # (y_i-Ybar)%*%(y_i-Ybar)'
   mult_func <- function(x) {
     vec <- t(t(diff$diff[diff$pairing == x]))
@@ -241,7 +241,7 @@
 #' @examples
 #' dat <- system.file("extdata", "MAE.RDS", package = "LegATo") |>
 #' readRDS()
-#' dat_0.05 <- filter_MAE(dat, 0.05)
+#' dat_0.05 <- filter_MAE(dat)
 #' out1 <- test_hotelling_t2(dat = dat_0.05,
 #'                   test_index = which(dat_0.05$MothChild == "Infant" &
 #'                                        dat_0.05$timepoint == 6),

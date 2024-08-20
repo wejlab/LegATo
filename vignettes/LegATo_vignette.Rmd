@@ -174,7 +174,7 @@ dat_cleaned <- clean_MAE(dat_subsetted)
 Many metagenomic pipelines identify taxon abundances at extremely small levels, which can be noisy to deal with in an analysis. The `filter_MAE` function smoothly transforms reads belonging to taxa with an overall genera threshold under the `filter_prop` (filter proportion) argument, which we will set as 0.005.
 
 ```{R}
-dat_filt <- filter_MAE(dat_cleaned, 0.05)
+dat_filt <- filter_MAE(dat_cleaned)
 ```
 
 ### Parse MAE to extract data
@@ -331,8 +331,9 @@ Citations:
 
 Yilong Zhang, Sung Won Han, Laura M Cox, and Huilin Li. A multivariate distance-based analytic framework for microbial interdependence association test in longitudinal study. Genetic epidemiology, 41(8):769–778, 2017. doi:10.1002/gepi.22065.
 ```{R}
-dat_0.1 <- filter_MAE(dat_cleaned, 0.1)
-NMIT(dat_0.1, unit_var = "Subject", fixed_cov = "HIVStatus",
+dat_1 <- filter_MAE(dat_cleaned, 0.05, 10, "species")
+
+NMIT(dat_1, unit_var = "Subject", fixed_cov = "HIVStatus",
      covariate_time = "timepoint",
      method = "kendall", dist_type = "F",
      heatmap = TRUE, classify = FALSE, fill_na = 0)
@@ -347,11 +348,10 @@ For this example, HEU and HUU infants are designated as the two sampling units o
 For paired tests, we chose p = 6 variables to ensure that n < p so that singularity could be avoided and T2 could be properly computed, where n is the number of measurements in a sampling unit. Normality is met by using microbe abundances in log CPM units, which is calculated within the function.
 
 ```{R}
-test_hotelling_t2(dat = dat_filt,
+test_hotelling_t2(dat = dat_1,
                   test_index = which(dat_filt$MothChild == "Infant" &
                                        dat_filt$timepoint == 6),
                   taxon_level = "genus",
-                  # To avoid n < p, use top 5-6 species
                   num_taxa = 6,
                   paired = TRUE,
                   grouping_var = "HIVStatus",
@@ -360,10 +360,9 @@ test_hotelling_t2(dat = dat_filt,
 
 Group comparisons can also be tested on unpaired data:
 ```{R}
-test_hotelling_t2(dat = dat_filt,
+test_hotelling_t2(dat = dat_1,
                   test_index = which(dat_filt$timepoint == 0),
                   taxon_level = "genus",
-                  # To avoid n < p, use top 5-6 species
                   num_taxa = 6,
                   grouping_var = "HIVStatus",
                   unit_var = "Subject",
@@ -380,7 +379,7 @@ Generalized estimating equations (GEEs) as described in Liang and Zeger (1986) a
 For each genus present in the microbial aggregate of samples, we model normalized log CPM relative taxon counts, estimating the effects of time point and HIV exposure status and their interaction, while accounting for the underlying structure of clusters formed by individual subjects. 
 
 ```{R}
-output <- run_gee_model(dat_filt, unit_var = "Subject",
+output <- run_gee_model(dat_1, unit_var = "Subject",
                         fixed_cov = c("HIVStatus", "timepoint"),
                         corstr = "ar1",
                         plot_out = FALSE,
@@ -397,7 +396,7 @@ tempfolder <- tempfile()
 dir.create(tempfolder)
 
 # Trying out plotting
-output <- run_gee_model(dat_filt, unit_var = "Subject",
+output <- run_gee_model(dat_1, unit_var = "Subject",
               taxon_level = "genus",
               fixed_cov = c("HIVStatus", "timepoint"),
               corstr = "ar1",
@@ -418,7 +417,9 @@ knitr::include_graphics("Streptococcus_timepoint.png")
 
 Similarly, you can also run linear mixed-effects models:
 ```{R}
-output <- run_lmm_model(dat_filt, unit_var = "Subject",
+# If there are issues with matrix being positive definite
+# Revisit filtering parameters in filter_MAE
+output <- run_lmm_model(dat_1, unit_var = "Subject",
                         taxon_level = "genus",
                         fixed_cov = c("timepoint", "HIVStatus"),
                         plot_out = FALSE,

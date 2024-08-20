@@ -36,6 +36,7 @@ Zeger
 Zenodo
 al
 ar
+circlize
 colData
 commensal
 compositional
@@ -46,12 +47,17 @@ doi
 edu
 emph
 et
+geepack
 gepi
+ggalluvial
+ggeffects
+grDevices
 gridded
 https
 infants’
 intra
 kendall
+lmerTest
 mEtaGenomic
 metagenomic
 microbiome

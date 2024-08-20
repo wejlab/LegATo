@@ -60,7 +60,7 @@ following methods are permitted: \code{c("holm", "hochberg", "hommel",
 \examples{
 dat <- system.file("extdata/MAE.RDS", package = "LegATo") |>
   readRDS() |>
-  filter_MAE(0.05)
+  filter_MAE()
 out <- run_lmm_model(dat, taxon_level = "genus", unit_var = "Subject",
                      fixed_cov = c("HIVStatus", "timepoint"))
 head(out)

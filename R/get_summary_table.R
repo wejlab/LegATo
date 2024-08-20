@@ -6,7 +6,9 @@
 #' @inheritParams plot_stacked_bar
 #' @param group_vars A character string or character vector of covariates
 #' found in \code{colData(dat)} to use in grouping counts. The variables
-#' should be listed in order of desired grouping.
+#' should be listed in order of desired grouping. Default is \code{NULL},
+#' which does not rely on a grouping variable and instead produces statistics
+#' for the entirety of the data.
 #' 
 #' @return A \code{data.frame} of the grouping columns, mean_reads, sd_reads,
 #' min_reads, max_reads and num_total.
@@ -20,7 +22,7 @@
 #' head(out)
 #'
 
-get_summary_table <- function(dat, group_vars) {
+get_summary_table <- function(dat, group_vars = NULL) {
   microbe <- parse_MAE_SE(dat)
   counts_table <- microbe$counts
   tax_table <- microbe$tax
@@ -36,9 +38,12 @@ get_summary_table <- function(dat, group_vars) {
     dplyr::group_by(.data$Sample_id) %>%
     dplyr::summarise(TotalAbundance = sum(.data$Abundance)) %>%
     dplyr::left_join(tibble::rownames_to_column(sam_table, "Sample_id"),
-                     by = "Sample_id") %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(c(group_vars))))
+                     by = "Sample_id")
   
+  if (!is.null(group_vars)) {
+    reads_tbl <- reads_tbl %>%
+      dplyr::group_by(dplyr::across(dplyr::all_of(c(group_vars))))
+  }
   summary_tab <- reads_tbl %>%
     dplyr::summarise(mean_reads = base::mean(.data$TotalAbundance),
                      sd_reads = stats::sd(.data$TotalAbundance),

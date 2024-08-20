@@ -66,7 +66,7 @@ test_models_lmm <- function(tn, input_df, unit_var, fixed_cov,
 #' @examples
 #' dat <- system.file("extdata/MAE.RDS", package = "LegATo") |>
 #'   readRDS() |>
-#'   filter_MAE(0.05)
+#'   filter_MAE()
 #' out <- run_lmm_model(dat, taxon_level = "genus", unit_var = "Subject",
 #'                      fixed_cov = c("HIVStatus", "timepoint"))
 #' head(out)

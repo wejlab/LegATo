@@ -33,17 +33,15 @@ time-based covariate in the metadata to group abundances by.}
 "spearman"). The default method is "kendall".}
 
 \item{dist_type}{A character string specifying the type of matrix norm to be
-  computed. The default is \code{"F"}.
-\itemize{
-    \item{\code{"M"} or \code{"m"}}{specifies the maximum modulus of all the
-    elements in \code{x}.}
-    \item{\code{"O"}, \code{"o"} or \code{"1"}}{specifies the one norm,
-    (maximum absolute column sum);}
-    \item{\code{"I"} or \code{"i"}}{specifies the infinity norm (maximum
-    absolute row sum);}
-    \item{\code{"F"} or \code{"f"}}{specifies the Frobenius norm (the
-    Euclidean norm of \code{x} treated as if it were a vector)}
-}}
+computed. The default is \code{"F"}.
+* \code{"M"} or \code{"m"} specifies the maximum modulus of all the
+  elements in \code{x};
+* \code{"O"}, \code{"o"} or \code{"1"} specifies the one norm,
+  (maximum absolute column sum);
+* \code{"I"} or \code{"i"} specifies the infinity norm (maximum
+  absolute row sum);
+* \code{"F"} or \code{"f"} specifies the Frobenius norm (the
+  Euclidean norm of \code{x} treated as if it were a vector)}
 
 \item{heatmap}{A logical value indicating whether to draw heatmap. The
 default is \code{TRUE}.}

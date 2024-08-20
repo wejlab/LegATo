@@ -2,9 +2,10 @@
 mk_gee_plot <- function(this_coef, complex, tn, unit_var,
                         plotsave_loc, plot_terms, ...) {
   term_input <- unique(c(this_coef, plot_terms))
-  if (!requireNamespace("ggeffects", quietly = TRUE)) {
-    message("The 'ggeffects' package is not installed",
-            "Please install it from CRAN to use this function.")
+  if (!requireNamespace("ggeffects", quietly = TRUE) &&
+      !requireNamespace("emmeans", quietly = TRUE)) {
+    message("The 'ggeffects' and/or 'emmeans' packages are not installed",
+            "Please install them from CRAN to use this function.")
   }
   p <- plot(ggeffects::ggemmeans(complex, terms = term_input)) + 
     ggplot2::labs(subtitle = "Estimated marginal means",
@@ -65,7 +66,7 @@ test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
 #' grouping ID variable, usually the unit on which repeated measurements were
 #' taken. This modeling approach works best with small datasets that multiple
 #' samples across many (>40) clusters/units. Note, the "broom", "ggeffects",
-#' "broom.mixed", "geepack" packages are required to use this
+#' "broom.mixed", "geepack", "emmeans" packages are required to use this
 #' function; all can be installed via CRAN.
 #'
 #' P-values are adjusted for the model coefficients within each taxon. The

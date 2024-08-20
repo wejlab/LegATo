@@ -53,7 +53,7 @@ test_models_lm <- function(tn, input_df, fixed_cov,
 #' @examples
 #' dat <- system.file("extdata/MAE.RDS", package = "LegATo") |>
 #'   readRDS() |>
-#'   filter_animalcules_MAE(0.05)
+#'   filter_MAE()
 #' out <- run_lm_model(dat, fixed_cov = c("timepoint", "HIVStatus"),
 #'                     plot_out = FALSE)
 #' head(out)

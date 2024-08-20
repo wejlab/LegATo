@@ -1,6 +1,6 @@
 Package: LegATo
 Title: LegATo: Longitudinal mEtaGenomic Analysis Toolkit
-Version: 0.99.4
+Version: 0.99.6
 Authors@R: c(
     person("Aubrey", "Odom", , "aodom@bu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7113-7598")),
@@ -22,8 +22,10 @@ Description: LegATo is a suite of open-source software tools for
     perturbations over time, including changes in composition or stability
     of commensal bacteria.
 License: MIT + file LICENSE
+URL: https://wejlab.github.io/LegATo-docs/
+BugReports: https://github.com/wejlab/LegATo/issues
 Depends:
-    R (>= 4.3.0)
+    R (>= 4.4.0)
 Imports:
     animalcules,
     data.table,
@@ -45,6 +47,7 @@ Suggests:
     broom.mixed,
     circlize,
     ComplexHeatmap,
+    emmeans,
     geepack,
     ggalluvial,
     ggeffects,
@@ -52,6 +55,7 @@ Suggests:
     knitr,
     lme4,
     lmerTest,
+    methods,
     RColorBrewer,
     rmarkdown,
     spelling,

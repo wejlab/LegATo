@@ -4,7 +4,7 @@
 \alias{get_summary_table}
 \title{Create a table summarizing reads aggregated by grouping variables on a unit}
 \usage{
-get_summary_table(dat, group_vars)
+get_summary_table(dat, group_vars = NULL)
 }
 \arguments{
 \item{dat}{A \code{MultiAssayExperiment} object specially formatted as an
@@ -12,7 +12,9 @@ animalcules output.}
 
 \item{group_vars}{A character string or character vector of covariates
 found in \code{colData(dat)} to use in grouping counts. The variables
-should be listed in order of desired grouping.}
+should be listed in order of desired grouping. Default is \code{NULL},
+which does not rely on a grouping variable and instead produces statistics
+for the entirety of the data.}
 }
 \value{
 A \code{data.frame} of the grouping columns, mean_reads, sd_reads,

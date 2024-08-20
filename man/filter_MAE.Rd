@@ -2,31 +2,49 @@
 % Please edit documentation in R/filter_MAE.R
 \name{filter_MAE}
 \alias{filter_MAE}
-\title{Filter a MultiAssayExperiment to a top percentage of taxa and label the rest
-as "Other"}
+\title{Filter a MultiAssayExperiment object to keep a top percentage of taxa}
 \usage{
-filter_MAE(dat, filter_prop = 0.001)
+filter_MAE(
+  dat,
+  relabu_threshold = 3,
+  occur_pct_cutoff = 5,
+  taxon_level = "genus"
+)
 }
 \arguments{
 \item{dat}{A \code{MultiAssayExperiment} object specially formatted as an
 animalcules output.}
 
-\item{filter_prop}{A double strictly between 0 and 1, representing
-the proportion of relative abundance at which to filter. Default is 0.001.}
+\item{relabu_threshold}{A double(percentage) between 0 and 100, representing
+the relative abundance criterion that all OTUs should meet to be retained.
+The smaller the threshold, the fewer the OTUs will be retained. Default is
+3\%.}
+
+\item{occur_pct_cutoff}{A double (percentage) between 0 and 100
+representing the percent cutoff for how many OTUs must meet the
+\code{relabu_threshold} across the samples to be retained. It is wise to
+keep the number of samples in mind when setting this parameter. Default is 5\%.}
+
+\item{taxon_level}{Character string indicating the level of taxonomy to
+aggregate the counts data. Must be the name of a column in
+\code{MultiAssayExperiment::rowData(dat)}.}
 }
 \value{
-An animalcules-formatted \code{MultiAssayExperiment} object with
-  appropriate filtration.
+An animalcules-formatted \code{MultiAssayExperiment} object
+with major OTUs retained.
 }
 \description{
-This function takes an animalcules-formatted \code{MultiAssayExperiment}
-(MAE) object and identifies all taxa at the "genus" level that represent
-<\code{filter_prop} average relative abundance across all samples in the MAE.
-After identification at the genus level, taxa across the genus and species
-levels are then consolidated into the category "Other".
+This function takes an animalcules-formatted \code{MultiAssayExperiment} (MAE)
+object and identifies all taxa at the OTU level of choice that exhibit a
+relative abundance greater than or equal to a relative abundance percent
+threshold, \code{relabu_threshold}, in at least \code{occur_pct_cutoff}\% of
+the total samples. After filtration, taxa across the specified OTU level and
+all downstream levels are then consolidated into the category "Other".
 }
 \examples{
-in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
-filter_MAE(in_dat, 0.01)
+  in_dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |>
+    readRDS()
+  filter_MAE(in_dat, relabu_threshold = 3, occur_pct_cutoff = 5,
+             taxon_level = "genus")
 
 }

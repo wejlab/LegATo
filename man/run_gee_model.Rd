@@ -57,7 +57,7 @@ CPM abundance as a product of fixed-effects covariates conditional on a
 grouping ID variable, usually the unit on which repeated measurements were
 taken. This modeling approach works best with small datasets that multiple
 samples across many (>40) clusters/units. Note, the "broom", "ggeffects",
-"broom.mixed", "geepack" packages are required to use this
+"broom.mixed", "geepack", "emmeans" packages are required to use this
 function; all can be installed via CRAN.
 }
 \details{
