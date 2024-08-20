@@ -44,7 +44,7 @@
     dplyr::reframe(Xbar = mean(.data$Xi))
   # X_i - Xbar
   diff <- X_i %>%
-    dplyr::left_join(., Xbar, by = c("Populations", "Taxon")) %>%
+    dplyr::left_join(Xbar, by = c("Populations", "Taxon")) %>%
     dplyr::group_by(.data$Subjects, .data$Taxon) %>%
     dplyr::reframe("diff" = .data$Xi - .data$Xbar)
   # (X_ij-Xbar_i)%*%(X_ij-Xbar_i)'
@@ -132,7 +132,7 @@
                      .groups = "drop")
   # Y_i - Ybar
   diff <- Y_i %>%
-    dplyr::left_join(., Ybar, by = "Taxon") %>%
+    dplyr::left_join(Ybar, by = "Taxon") %>%
     dplyr::group_by(.data$pairing, .data$Taxon) %>%
     dplyr::summarise("diff" = .data$Yi - .data$Ybar, .groups = "drop")
   # (y_i-Ybar)%*%(y_i-Ybar)'
@@ -242,12 +242,13 @@
 #' @examples
 #' dat <- system.file("extdata", "MAE.RDS", package = "LegATo") |>
 #' readRDS()
-#' dat_0.05 <- filter_MAE(dat)
+#' dat_0.05 <- filter_MAE(dat, 0.001, 10, "species")
 #' out1 <- test_hotelling_t2(dat = dat_0.05,
 #'                   test_index = which(dat_0.05$MothChild == "Infant" &
-#'                                        dat_0.05$timepoint == 6),
+#'                                        dat_0.05$timepoint == 0),
 #'                   taxon_level = "genus",
-#'                   num_taxa = 6,
+#'                   # Total number of pairs - 1
+#'                   num_taxa = 9,
 #'                   paired = TRUE,
 #'                   grouping_var = "HIVStatus",
 #'                   pairing_var = "pairing")
@@ -255,14 +256,16 @@
 #' 
 #' out <- test_hotelling_t2(dat = dat_0.05,
 #'                   test_index = which(dat_0.05$MothChild == "Mother" &
-#'                                        dat_0.05$timepoint == 0),
+#'                                        dat_0.05$timepoint == 6),
 #'                   taxon_level = "genus",
-#'                   num_taxa = 12,
+#'                   # Max is Total number of subjects - 2
+#'                   # Here we use a much smaller number
+#'                   num_taxa = 6,
 #'                   grouping_var = "HIVStatus",
 #'                   unit_var = "Subject",
 #'                   paired = FALSE)
 #' out                  
-#' 
+#'
 
 test_hotelling_t2 <- function(dat,
                               test_index = NULL,
@@ -285,7 +288,7 @@ test_hotelling_t2 <- function(dat,
     output_data <- input_data %>%
       dplyr::select(dplyr::all_of(c(grouping_var, pairing_var)), "taxon",
                     "Abundance") %>%
-      tidyr::pivot_wider(., id_cols = dplyr::all_of(c("taxon", pairing_var)),
+      tidyr::pivot_wider(id_cols = dplyr::all_of(c("taxon", pairing_var)),
                          values_from = "Abundance",
                          names_from = dplyr::all_of(grouping_var)) %>%
       dplyr::arrange(.data$pairing) %>%

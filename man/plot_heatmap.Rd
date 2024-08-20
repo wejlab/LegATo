@@ -120,7 +120,35 @@ Code was adapted from the \code{TBSignatureprofiler} R package.
 }
 \examples{
 library(SummarizedExperiment)
-# Generate some artificial data that shows a difference in Zak_RISK_16
+# Example with a Summarized Experiment data object
+dat <- system.file("extdata/MAE_small.RDS", package = "LegATo") |> readRDS()
+input_SE <- dat[["MicrobeGenetics"]]
+
+## Creating a continuous color ramp annot col list
+Hairrange <- range(colData(input_SE)[, "HairLength"])
+color2 <- circlize::colorRamp2(c(Hairrange[1], Hairrange[2]), c("blue", "red"))
+color.list <- list("HairLength" = color2)
+
+## Create plot
+plot_heatmap(
+  inputData = input_SE,
+  name = "Microbe abundances",
+  plot_title = "Example Heatmap",
+  plottingColNames = colnames(input_SE),
+  annotationColNames = "HairLength",
+  colList = color.list,
+  scale = TRUE,
+  showColumnNames = TRUE,
+  showRowNames = FALSE,
+  colorSets = 
+    c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Accent", "Dark2",
+      "Paired"),
+  choose_color = c("blue", "gray95", "red"),
+  split_heatmap = "none",
+  column_order = NULL
+)
+
+# Artificial data example - matrix input
 mat_testdata <- rbind(matrix(c(rnorm(80), rnorm(80) + 5), 16, 10,
                              dimnames = list(paste0("Taxon", seq_len(16)),
                                              paste0("sample", seq_len(10)))),

@@ -1,3 +1,5 @@
+utils::globalVariables(".")
+
 #' Create a long data.frame with grouped abundances from a MultiAssayExperiment counts object
 #' 
 #' This function takes a \code{MultiAssayExperiment} object and a specified

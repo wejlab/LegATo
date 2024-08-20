@@ -48,12 +48,6 @@ navbar:
       menu:
         - text: "Command Line Analysis"
           href: articles/LegATo_vignette.html
-        - text: "NMIT"
-          href: articles/NMIT.html
-        - text: "Modeling with GEEs and LMMs"
-          href: articles/Modeling.html
-        - text: "Hotelling's T-Squared Test"
-          href: articles/Hotelling.html
     - text: "Function Reference"
       href: reference/index.html
     - text: "Package News"

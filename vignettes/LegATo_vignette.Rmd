@@ -312,14 +312,7 @@ p <- plot_heatmap(inputData = this_taxon,
 
 For a concrete analysis of longitudinal microbiome data, `LegATo` provides NMIT, both a paired and unpaired multivariate Hotelling's T-squared test, generalized estimating equations (GEEs) and linear mixed effects models (LMEMs/LMMs).
 
-**Detailed explanations of each are available on the LegATo website:**
-
-* [Nonparametric microbial interdependence test (NMIT)](https://wejlab.github.io/LegATo-docs/articles/NMIT.html)
-* [Modeling with GEEs and LMMs](https://wejlab.github.io/LegATo-docs/articles/Modeling.html)
-* [Hotelling's T-Squared test](https://wejlab.github.io/LegATo-docs/articles/NMIT.html)
-
-
-Otherwise a brief overview of each method is provided below.
+A brief overview of each method is provided below.
 
 ## Nonparametric microbial interdependence test (NMIT)
 

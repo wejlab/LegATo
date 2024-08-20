@@ -17,7 +17,7 @@ An animalcules-formatted \code{MultiAssayExperiment} object with
 \description{
 This functional is an optional method for fixing up taxon names in a
 \code{MultiAssayExperiment} to be run before \code{filter_MAE}.
-Specifically it removes brackets from species names, replaces species labeled
+Specifically, it removes brackets from species names, replaces species labeled
 as "others" with "sp." and finally replaces underscores with spaces.
 }
 \examples{
