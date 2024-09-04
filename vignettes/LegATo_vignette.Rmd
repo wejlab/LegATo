@@ -61,6 +61,12 @@ Now we'll load the LegATo package into our library:
 library(LegATo)
 ```
 
+For the purposes of this vignette, we'll also load the `ggeffects` and `emmeans` library:
+```{R}
+library(ggeffects)
+library(emmeans)
+```
+
 # Formatting input data for use with LegATo
 
 LegATo functions expect data that is properly formatted in a `MultiAssayExperiment` container that is compatible with the [animalcules package](https://wejlab.github.io/animalcules-docs/). Obtaining properly formatted data can be achieved easily via the `create_formatted_MAE()` function from the LegATo package, as detailed below.
@@ -420,7 +426,6 @@ output <- run_lmm_model(dat_1, unit_var = "Subject",
                         plot_terms = NULL)
 
 head(output) |> knitr::kable(caption = "LMM Outputs")
-
 ```
 
 # Session Info
