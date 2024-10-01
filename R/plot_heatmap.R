@@ -53,11 +53,10 @@ distinctColors <- function(n, hues = c("red", "cyan", "orange", "blue",
   v <- seq(from = value.range[2], to = value.range[1], length = num.vs)
   
   ## Create all combinations of hues with saturation/value pairs
-  new.hsv <- c()
-  for (i in seq_len(num.vs)) {
-    temp <- rbind(hues.hsv[1, ], s[i], v[i])
-    new.hsv <- cbind(new.hsv, temp)
-  }
+  new.hsv <- dplyr::tibble(V1 = rep(hues.hsv[1, ], num.vs),
+                           V2 = rep(s, each = length(hues)),
+                           V3 = rep(v, each = length(hues))) |>
+      t() |> as.matrix() |> magrittr::set_rownames(NULL)
   
   ## Convert to HEX
   col <- grDevices::hsv(new.hsv[1, ], new.hsv[2, ], new.hsv[3, ])

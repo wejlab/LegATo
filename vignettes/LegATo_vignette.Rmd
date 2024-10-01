@@ -114,7 +114,7 @@ You should note the following:
 
 ## Use `create_formatted_MAE()`
 
-So once your data are formatted correctly, you can pretty easily use `create_formatted_MAE()` like so:
+Once your data are formatted correctly, you can easily use `create_formatted_MAE()` like so:
 ```{R}
 output <- create_formatted_MAE(counts_dat = counts,
                                tax_dat = tax,
@@ -125,6 +125,8 @@ MultiAssayExperiment::assays(output)
 SummarizedExperiment::assays(output[["MicrobeGenetics"]])
 ```
 
+If your data is in the format of a TreeSummarizedExperiment, you can call `create_formatted_MAE(tree_SE)` to create a MAE output that is compatible with the package.
+
 ## Adding information to your metadata later in your analysis
 
 If information needs to be added to your data object at some point in the analysis, it is easiest to manipulate the raw data objects (potentially via `parse_MAE_SE()`) and then recreate the `MAE` object with `create_formatted_MAE()`.
@@ -133,7 +135,7 @@ If information needs to be added to your data object at some point in the analys
 
 To illustrate the capabilities of LegATo, we will turn to a published dataset from the following paper:
 
-Odom-Mabey AR, Gill CJ, Pieciak R et al. Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants [version 1; peer review: 1 approved with reservations]. Gates Open Res 2022, 6:143 (https://doi.org/10.12688/gatesopenres.14041.1)
+Odom AR, Gill CJ, Pieciak R et al. Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants [version 2; peer review: 2 approved with reservations]. Gates Open Res 2024, 6:143 (https://doi.org/10.12688/gatesopenres.14041.2)
 
 The raw dataset is archived in Zenodo:
 
@@ -180,7 +182,7 @@ dat_cleaned <- clean_MAE(dat_subsetted)
 Many metagenomic pipelines identify taxon abundances at extremely small levels, which can be noisy to deal with in an analysis. The `filter_MAE` function smoothly transforms reads belonging to taxa with an overall genera threshold under the `filter_prop` (filter proportion) argument, which we will set as 0.005.
 
 ```{R}
-dat_filt <- filter_MAE(dat_cleaned)
+dat_filt <- filter_MAE(dat_cleaned, relabu_threshold = 0.05, occur_pct_cutoff = 10)
 ```
 
 ### Parse MAE to extract data
@@ -255,13 +257,13 @@ plot_alluvial(dat = dat_filt,
 We can create spaghetti or volatility plots to elucidate changes over time on a sample level for a given taxon. This is advantageous as other visualization methods are often aggregates of multiple samples and lack granularity. These plots can be created with `plot_spaghetti()`.
 
 ```{R, results = "asis", message = FALSE}
-  p <- plot_spaghetti(dat = dat_filt,
+  plot_spaghetti(dat = dat_filt,
                covariate_time = "timepoint",
                covariate_1 = "HIVStatus",
                unit_var = "Subject",
                taxon_level = "genus",
                which_taxon = "Staphylococcus",
-               palette_input= this_palette,
+               palette_input = this_palette,
                title = "Spaghetti Plot",
                subtitle = NULL) +
   ggplot2::xlab("Infant Age (Days)") +
@@ -390,9 +392,8 @@ head(output) |> knitr::kable(caption = "GEE Outputs")
 
 You can also create plots of the covariates, which will be saved to a folder specified by the user:
 
-```{R}
-tempfolder <- tempfile()
-dir.create(tempfolder)
+```{R, out.width = "50%", fig.align = "center", echo = FALSE}
+tempfolder <- tempdir()
 
 # Trying out plotting
 output <- run_gee_model(dat_1, unit_var = "Subject",
@@ -404,12 +405,12 @@ output <- run_gee_model(dat_1, unit_var = "Subject",
               plot_terms = "timepoint",
               width = 6, height = 4, units = "in", scale = 0.7)
 
-unlink(tempfolder, recursive = TRUE)
-```
+list.files(tempfolder)
 
-```{R,  out.width = "50%", fig.align = "center", echo = FALSE}
-knitr::include_graphics("Dolosigranulum_timepoint.png")
-knitr::include_graphics("Streptococcus_timepoint.png")
+knitr::include_graphics(file.path(tempfolder, "Dolosigranulum_timepoint.png"))
+knitr::include_graphics(file.path(tempfolder, "Streptococcus_timepoint.png"))
+
+unlink(tempfolder, recursive = TRUE)
 ```
 
 ### Linear Mixed Models

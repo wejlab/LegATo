@@ -4,26 +4,38 @@
 \alias{create_formatted_MAE}
 \title{Create a formatted MultiAssayExperiment compatible with LegATo}
 \usage{
-create_formatted_MAE(counts_dat, tax_dat, metadata_dat)
+create_formatted_MAE(
+  counts_dat = NULL,
+  tax_dat = NULL,
+  metadata_dat = NULL,
+  tree_SE = NULL
+)
 }
 \arguments{
 \item{counts_dat}{A matrix, data.table, or data.frame consisting of microbial
 raw counts data. The \code{colnames} should be sample names and the
-\code{rownames} should be in the same order as the \code{tax_dat} entries.}
+\code{rownames} should be in the same order as the \code{tax_dat} entries.
+Not required if \code{tree_SE} is passed in.}
 
 \item{tax_dat}{A matrix, data.table, or data.frame of hierarchical taxonomic
 data. Should have columns such as "family", "genus", "species" with each
 row uniquely delineating a different taxon. The rows should be in the same
-order as the rows of \code{counts_dat}.}
+order as the rows of \code{counts_dat}. Not required if \code{tree_SE} is
+passed in.}
 
 \item{metadata_dat}{A metadata table with \code{rownames} equivalent to the
-samples that are the \code{colnames} of the \code{counts_dat}.}
+samples that are the \code{colnames} of the \code{counts_dat}. Not required
+if \code{tree_SE} is passed in.}
+
+\item{tree_SE}{A TreeSummarizedExperiment object with counts, taxonomy, and
+metadata.}
 }
 \value{
 A \code{MultiAssayExperiment} object.
 }
 \description{
-This function takes a counts_dat, tax_dat, or metadata_dat input and creates
+This function takes either a counts_dat, tax_dat, and metadata_dat input OR
+a TreeSummarizedExperiment input and creates
 a specifically-formatted MAE object that is compatible for use with LegATo
 and animalcules. Checks are performed on inputs to ensure that they can be
 integrated properly.

@@ -11,7 +11,7 @@ output: html_document
 
 This file consists of a MultiAssayExperiment object with raw data published in the following paper:
 
-Odom-Mabey, Aubrey R., et al. "Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants." Gates Open Research 6.143 (2022): 143.
+Odom AR, Gill CJ, Pieciak R et al. Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants [version 2; peer review: 2 approved with reservations]. Gates Open Res 2024, 6:143 (https://doi.org/10.12688/gatesopenres.14041.2)
 
 The code to create the package data object is reproduced below.
 

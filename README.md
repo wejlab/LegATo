@@ -27,7 +27,5 @@ LegATo requires R Version 4.3.
 Install the development version of the package from Github:
 
 ```
-if (!requireNamespace("devtools", quietly=TRUE))
-  install.packages("devtools")
-devtools::install_github("wejlab/LegATo")
+BiocManager::install("wejlab/LegATo")
 ```
