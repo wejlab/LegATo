@@ -25,28 +25,42 @@
 #' @returns A \code{MultiAssayExperiment} object.
 #' @examples
 #' nsample <- ntaxa <- 3
-#' counts_dat <- data.frame("X123" = runif(ntaxa, 0, 500),
-#'                          "X456" = runif(ntaxa, 0, 500),
-#'                          "X789" = runif(ntaxa, 0, 500))
-#' tax_dat <- data.frame("class" = c("rand1", "rand2", "rand3"),
-#'                       "species" = c("rand4", "rand5", "rand6")) |>
-#'   as.data.frame()
+#' counts_dat <- data.frame(
+#'     "X123" = runif(ntaxa, 0, 500),
+#'     "X456" = runif(ntaxa, 0, 500),
+#'     "X789" = runif(ntaxa, 0, 500)
+#' )
+#' tax_dat <- data.frame(
+#'     "class" = c("rand1", "rand2", "rand3"),
+#'     "species" = c("rand4", "rand5", "rand6")
+#' ) |>
+#'     as.data.frame()
 #' # Set rownames as lowest unique taxonomic level
 #' rownames(tax_dat) <- tax_dat$species
-#' metadata <- data.frame(Sample = c("X123", "X456", "X789"),
-#'                        Group = c("A", "B", "A"),
-#'                        Var = rnorm(nsample))
+#' rownames(counts_dat) <- tax_dat$species
+#' metadata <- data.frame(
+#'     Sample = c("X123", "X456", "X789"),
+#'     Group = c("A", "B", "A"),
+#'     Var = rnorm(nsample)
+#' )
 #' rownames(metadata) <- metadata$Sample
 #' out_MAE <- create_formatted_MAE(counts_dat, tax_dat, metadata)
-#' out_MAE
-#'
+#' 
+#' # TreeSummarizedExperiment
+#' tse <- TreeSummarizedExperiment::TreeSummarizedExperiment(
+#'     assays = list(counts = counts_dat),
+#'     colData = metadata,            
+#'     rowData = tax_dat             
+#' )
+#' out_MAE_2 <- create_formatted_MAE(tree_SE = tse)
+#' out_MAE_2
 
 create_formatted_MAE <- function(counts_dat = NULL, tax_dat = NULL, metadata_dat = NULL,
                                  tree_SE = NULL) {
     if (class(tree_SE) == "TreeSummarizedExperiment") {
-        counts_dat <- assays(tree_SE)[[1]]
-        tax_dat <- rowData(tree_SE)
-        metadata_dat <- colData(tree_SE) |> as.data.frame() 
+        counts_dat <- SummarizedExperiment::assays(tree_SE)[[1]]
+        tax_dat <-SummarizedExperiment::rowData(tree_SE)
+        metadata_dat <- SummarizedExperiment::colData(tree_SE) |> as.data.frame() 
     } else {
         if (is.null(counts_dat) | is.null(tax_dat) | is.null(metadata_dat)) {
             stop("Please supply counts, taxonomy, and metadata tables.")

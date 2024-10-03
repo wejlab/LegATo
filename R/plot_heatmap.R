@@ -333,5 +333,5 @@ plot_heatmap <- function(inputData, annotationData = NULL, plot_title = NULL,
                             column_order = column_order,
                             cluster_columns = TRUE, ...),
     annotation_legend_side = "bottom")
-  return()
+  return(NULL)
 }

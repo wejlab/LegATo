@@ -12,6 +12,24 @@
   return(MAE)
 }
 
+# Helper function for if standard deviation is 0 during stats::cor
+safe_cor <- function(x, y = NULL, method = "pearson") {
+    df <- x[, colSums(x) != 0]
+    tryCatch({
+        # Try to compute the correlation
+        result <- cor(x = df, y, method = method)
+        return(result)
+    }, error = function(e) {
+        # If an error occurs (like zero standard deviation), return NA or a custom message
+        if (grepl("the standard deviation is zero", e$message)) {
+            return(NA)
+        } else {
+            # Return the error message if it's another issue
+            stop(e)
+        }
+    })
+}
+
 #' Calculate within-subject OTU correlations
 #'
 #' This function takes a \code{MultiAssayExperiment} and outputs an array of
@@ -49,7 +67,8 @@ tscor <- function(dat, unit_var, method = "kendall", fill_na = 0) {
   otu_list <- split(otus, sub_split)
   
   # Pairwise correlations for each OTU sub-table
-  cor_list <- lapply(otu_list, stats::cor, method = method)
+  cor_list <- lapply(otu_list, safe_cor, method = method)
+  
   names.cor <- names(cor_list)
   names.otu <- colnames(otus)
   

@@ -42,19 +42,33 @@ integrated properly.
 }
 \examples{
 nsample <- ntaxa <- 3
-counts_dat <- data.frame("X123" = runif(ntaxa, 0, 500),
-                         "X456" = runif(ntaxa, 0, 500),
-                         "X789" = runif(ntaxa, 0, 500))
-tax_dat <- data.frame("class" = c("rand1", "rand2", "rand3"),
-                      "species" = c("rand4", "rand5", "rand6")) |>
-  as.data.frame()
+counts_dat <- data.frame(
+    "X123" = runif(ntaxa, 0, 500),
+    "X456" = runif(ntaxa, 0, 500),
+    "X789" = runif(ntaxa, 0, 500)
+)
+tax_dat <- data.frame(
+    "class" = c("rand1", "rand2", "rand3"),
+    "species" = c("rand4", "rand5", "rand6")
+) |>
+    as.data.frame()
 # Set rownames as lowest unique taxonomic level
 rownames(tax_dat) <- tax_dat$species
-metadata <- data.frame(Sample = c("X123", "X456", "X789"),
-                       Group = c("A", "B", "A"),
-                       Var = rnorm(nsample))
+rownames(counts_dat) <- tax_dat$species
+metadata <- data.frame(
+    Sample = c("X123", "X456", "X789"),
+    Group = c("A", "B", "A"),
+    Var = rnorm(nsample)
+)
 rownames(metadata) <- metadata$Sample
 out_MAE <- create_formatted_MAE(counts_dat, tax_dat, metadata)
-out_MAE
 
+# TreeSummarizedExperiment
+tse <- TreeSummarizedExperiment::TreeSummarizedExperiment(
+    assays = list(counts = counts_dat),
+    colData = metadata,            
+    rowData = tax_dat             
+)
+out_MAE_2 <- create_formatted_MAE(tree_SE = tse)
+out_MAE_2
 }

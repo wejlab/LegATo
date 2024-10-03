@@ -30,7 +30,7 @@ test_models_lm <- function(tn, input_df, fixed_cov,
   return(res_out)
 }
 
-#' Compute linear models (LMM) on microbiome data
+#' Compute linear models (LM) on microbiome data
 #'
 #' This function takes an animalcules-formatted \code{MultiAssayExperiment} and
 #' runs an independent linear model for each taxon. The model predicts taxon log

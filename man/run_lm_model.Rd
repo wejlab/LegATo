@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_lm_model.R
 \name{run_lm_model}
 \alias{run_lm_model}
-\title{Compute linear models (LMM) on microbiome data}
+\title{Compute linear models (LM) on microbiome data}
 \usage{
 run_lm_model(
   dat,
