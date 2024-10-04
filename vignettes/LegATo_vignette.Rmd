@@ -7,8 +7,7 @@ author:
   email: aodom@bu.edu
 date: '`r format(Sys.Date(), "%B %e, %Y")`'
 package: LegATo
-output: 
-  BiocStyle::html_document
+output: html_document
 vignette: >
   %\VignetteIndexEntry{LegATo Tutorial}
   %\VignetteEncoding{UTF-8}
@@ -23,7 +22,7 @@ editor_options:
 
 Microbiome time-series data presents several distinct challenges, including complex covariate dependencies and a variety of longitudinal study designs. Furthermore, while several individual tools have been created to aid in longitudinal microbiome data analysis, an all-inclusive R-based toolkit has remained elusive. 
 
-To address these concerns, LegATo (Longitudinal mEtaGenomic Analysis TOolkit) has risen from the ashes. LegATo is a suite of open-source software tools for longitudinal microbiome analysis that is extendable to several different study forms, all while promising optimal ease-of-use for researchers.  This toolkit will allow researchers to determine which microbial taxa are affected over time by perturbations such as onset of disease or lifestyle choices, and to predict the effects of these perturbations over time, including changes in composition or stability of commensal bacteria.
+To address these concerns, we have created LegATo (Longitudinal mEtaGenomic Analysis TOolkit). LegATo is a suite of open-source software tools for longitudinal microbiome analysis that is extendable to several different study forms, all while promising optimal ease-of-use for researchers.  This toolkit will allow researchers to determine which microbial taxa are affected over time by perturbations such as onset of disease or lifestyle choices, and to predict the effects of these perturbations over time, including changes in composition or stability of commensal bacteria.
 
 Currently, LegATo entertains a number of data cleaning, aggregation, modeling and testing procedures. As we develop or learn of new methods, we will add to the toolkit accordingly. We will soon add hierarchical clustering tools and multivariate generalized estimating equations (JGEEs) to adjust for the compositional nature of microbiome data.
 
@@ -31,7 +30,7 @@ Currently, LegATo entertains a number of data cleaning, aggregation, modeling an
 
 ## Compatibility with `MultiAssayExperiment` and `SummarizedExperiment` objects
 
-The convenience of LegATo is in part credited to the integration of `MultiAssayExperiment` and `SummarizedExperiment` objects. These are reliable and clean data structures developed by the \emph{Bioconductor team} as part of the `r Biocpkg("MultiAssayExperiment")` and `r Biocpkg("SummarizedExperiment")` packages.
+The convenience of LegATo is in part credited to the integration of `MultiAssayExperiment` and `SummarizedExperiment` objects. These are reliable and clean data structures developed by the \emph{Bioconductor team} as part of the `r BiocStyle::Biocpkg("MultiAssayExperiment")` and `r BiocStyle::Biocpkg("SummarizedExperiment")` packages.
 
 The `MultiAssayExperiment` container concisely stores a `SummarizedExperiment` object, which aggregates data matrices along with annotation information, metadata, and reduced dimensionality data (PCA, t-SNE, etc.). To learn more about proper usage and context of these objects, you may want to take a look at the [MultiAssayExperiment package vignette](https://bioconductor.org/packages/release/bioc/vignettes/MultiAssayExperiment/inst/doc/MultiAssayExperiment.html) and [SummarizedExperiment package vignette](https://bioconductor.org/packages/release/bioc/vignettes/SummarizedExperiment/inst/doc/SummarizedExperiment.html).
 
@@ -39,21 +38,17 @@ To install these two packages, run the following code:
 ```{r MAE_SE_install, eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install("SummarizedExperiment")
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+BiocManager::install("MultiAssayExperiment")
 BiocManager::install("SummarizedExperiment")
 ```
 
 ## Installation and setup
 
-In order to install the development version of LegATo from Github, run the following code:
+To install the development version of LegATo from Github, run the following code:
 
 ```{r load_LegATo, eval = FALSE}
-if (!requireNamespace("devtools", quietly=TRUE))
-  install.packages("devtools")
-devtools::install_github("wejlab/LegATo")
+BiocManager::install("wejlab/LegATo")
 ```
 
 Now we'll load the LegATo package into our library:
@@ -69,17 +64,24 @@ library(emmeans)
 
 # Formatting input data for use with LegATo
 
-LegATo functions expect data that is properly formatted in a `MultiAssayExperiment` container that is compatible with the [animalcules package](https://wejlab.github.io/animalcules-docs/). Obtaining properly formatted data can be achieved easily via the `create_formatted_MAE()` function from the LegATo package, as detailed below.
+LegATo functions expect data properly formatted in a `MultiAssayExperiment` container, with naming conventions that are compatible with `r BiocStyle::Biocpkg("animalcules")`. Obtaining properly formatted data can be achieved easily via the `create_formatted_MAE()` function from the LegATo package, as detailed below.
 
 ## A note on compatibility with other packages
 
-If you've analyzed your metagenomic or 16S data via the [MetaScope package](https://wejlab.github.io/metascope-docs/), you can aggregate your sample outputs with user-input metadata using the `convert()` or `convert_silva()` functions. These functions create a taxonomy table and collate all data into a LegATo- and animalcules-compatible `MultiAssayExperiment` object.
+If you've analyzed your metagenomic or 16S data via the [MetaScope package](https://wejlab.github.io/metascope-docs/), you can aggregate your sample outputs with user-input metadata using the `MetaScope::convert_animalcules()` or `MetaScope::convert_animalcules_silva()` functions prior to loading your data into LegATo. These functions create a taxonomy table and collate all data into a LegATo- and animalcules-compatible `MultiAssayExperiment` object.
 
-You can also format your data analyzed elsewhere (like PathoScope 2.0) with the [animalcules package](https://wejlab.github.io/animalcules-docs/) in the upload step with the R Shiny app, and then select "Download Animalcules File" to obtain a `MAE` object that can be used with LegATo.
+You can also format your data analyzed elsewhere (e.g., PathoScope 2.0 or Kraken) with the [animalcules package](https://wejlab.github.io/animalcules-docs/) in the upload step with the R Shiny app, and then select "Download Animalcules File" to obtain a `MAE` object that can be used with LegATo.
 
 ## Requirements for using `create_formatted_MAE()`
 
 For the purposes of this example, we'll look at some example inputs unrelated to the main HIV-E infant data:
+
+* The `counts` table is composed of raw microbial counts. There is one row for each taxon, and one column for each sample.
+* The `tax` table is composed of taxonomy lineages. There is one row for each taxon, and any number of columns each taxonomic level (e.g., superkingdom, genus, species). The lowest level of taxonomy serves as the rownames for the table, and is also stored in its own column. Taxonomic levels increase in granularity from left to right.
+* The `sample` table contains entries for each sample, with unique sample IDs on the rows. The columns are metadata for the samples, such as subjects or units on which repeated measures were taken, groupings, pairings, and covariates.
+* `rownames(counts) == rownames(tax)`
+* `colnames(counts) == colnames(sample)`
+
 ```{R}
 counts <- system.file("extdata", "counts.csv", package = "LegATo") |>
   read.csv(row.names = 1) |>
@@ -104,15 +106,7 @@ sample[seq_len(ndim), ] |>
                label = NA)
 ```
 
-You should note the following:
-
-* The `counts` table is composed of raw microbial counts. There is one row for each taxon, and one column for each sample.
-* The `tax` table is composed of taxonomy lineages. There is one row for each taxon, and any number of columns each taxonomic level (e.g., superkingdom, genus, species). The lowest level of taxonomy serves as the rownames for the table, and is also stored in its own column. Taxonomic levels increase in granularity from left to right.
-* The `sample` table contains entries for each sample, with unique sample IDs on the rows. The columns are metadata for the samples, such as subjects or units on which repeated measures were taken, groupings, pairings, and covariates.
-* `rownames(counts) == rownames(tax)`
-* `colnames(counts) == colnames(sample)`
-
-## Use `create_formatted_MAE()`
+## Formatting your inputs with `create_formatted_MAE()`
 
 Once your data are formatted correctly, you can easily use `create_formatted_MAE()` like so:
 ```{R}
@@ -125,11 +119,11 @@ MultiAssayExperiment::assays(output)
 SummarizedExperiment::assays(output[["MicrobeGenetics"]])
 ```
 
-If your data is in the format of a TreeSummarizedExperiment, you can call `create_formatted_MAE(tree_SE)` to create a MAE output that is compatible with the package.
+If your data is in the format of a TreeSummarizedExperiment, you can call `create_formatted_MAE(tree_SE)` to create a `MAE` output that is compatible with the package.
 
 ## Adding information to your metadata later in your analysis
 
-If information needs to be added to your data object at some point in the analysis, it is easiest to manipulate the raw data objects (potentially via `parse_MAE_SE()`) and then recreate the `MAE` object with `create_formatted_MAE()`.
+If information needs to be added to your data object at some later point in the analysis, it is easiest to manipulate the raw data objects (potentially via `parse_MAE_SE()`) and then recreate the `MAE` object with `create_formatted_MAE()`.
 
 # Example data
 
@@ -139,7 +133,7 @@ Odom AR, Gill CJ, Pieciak R et al. Characterization of longitudinal nasopharynge
 
 The raw dataset is archived in Zenodo:
 
-Zenodo: Underlying data for ‘Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants’. https://doi.org/10.5281/zenodo.725531324
+*Zenodo: Underlying data for ‘Characterization of longitudinal nasopharyngeal microbiome patterns in maternally HIV-exposed Zambian infants’. https://doi.org/10.5281/zenodo.725531324*
 
 Further details on how the dataset was altered for inclusion in this package are provided [here](https://github.com/wejlab/LegATo/blob/main/inst/script/extdata_explanations.Rmd).
 
@@ -165,11 +159,11 @@ This leaves us with `r dim(parse_MAE_SE(dat_subsetted)$sam)[1]` samples in our a
 
 # Initial data exploration
 
-## MAE manipulation
+## `MultiAssayExperiment (MAE)` manipulation
 
 `LegATo` has several functions for manipulating `MAE` objects, delineated below:
 
-### Clean up animalcules-formatted MAEs
+### Clean up animalcules-formatted `MAE`s
 
 If your data were aggregated via the `animalcules` package, as was done for the example data, the samples were aggregated at the strain taxonomic level and have residual taxonomy IDs present. The `clean_MAE()` function cleans up data suffering from these issues.
 
@@ -182,7 +176,13 @@ dat_cleaned <- clean_MAE(dat_subsetted)
 Many metagenomic pipelines identify taxon abundances at extremely small levels, which can be noisy to deal with in an analysis. The `filter_MAE` function smoothly transforms reads belonging to taxa with an overall genera threshold under the `filter_prop` (filter proportion) argument, which we will set as 0.005.
 
 ```{R}
-dat_filt <- filter_MAE(dat_cleaned, relabu_threshold = 0.05, occur_pct_cutoff = 10)
+dat_filt_1 <- filter_MAE(dat_cleaned, relabu_threshold = 0.05, occur_pct_cutoff = 10)
+```
+
+The `filter_animalcules_MAE` function utilizes the same filtering mechanism as in the animalcules package:
+
+```{R}
+dat_filt <- filter_animalcules_MAE(dat_cleaned, 0.05)
 ```
 
 ### Parse MAE to extract data
@@ -235,12 +235,12 @@ There are several plots by which we can visualize changes in relative abundance 
 
 We'll select a palette using `paletteer`.
 ```{R}
-this_palette <- c("#FED439", "#709AE1", "#8A9197", "#D2AF81", "#FD7446", "#D5E4A2", "#197EC0", "#F05C3B", "#46732E",
-                  "#71D0F5", "#370335", "#075149", "#C80813", "#91331F", "#1A9993", "#FD8CC1")|>
+this_palette <- c("#709AE1", "#8A9197", "#D2AF81", "#FD7446", "#D5E4A2", "#197EC0", "#F05C3B", "#46732E",
+                  "#71D0F5", "#370335", "#075149", "#C80813", "#91331F", "#1A9993", "#FD8CC1") |>
   magrittr::extract(seq_len(nrow(best_genus)))
 ```
 
-### Alluvial plot
+### Alluvial plots
 
 Alluvial diagrams illustrate individual taxa as stream fields that change position at different time points. The height of a stream field represents the relative abundance of that taxon. At a given time point, stream fields are ranked from the highest to lowest abundance (top to bottom). These can be constructed with `plot_alluvial()`.
 ```{R}
@@ -252,7 +252,9 @@ plot_alluvial(dat = dat_filt,
               subtitle = "Alluvial plot")
 ```
 
-### Spaghetti plot
+In context, this plot indicates a high abundance of Staphylococcus in both the control and HIV-E infants in the first two weeks of life, but other genera quickly overtake **Staphylococcus** in dominance as shown by the changing rank of the streams for each time point. Overall, **Streptococcus** seems to have a far greater presence in the HIV-E infants' nasopharyngeal microbiota
+
+### Spaghetti plots
 
 We can create spaghetti or volatility plots to elucidate changes over time on a sample level for a given taxon. This is advantageous as other visualization methods are often aggregates of multiple samples and lack granularity. These plots can be created with `plot_spaghetti()`.
 
@@ -266,11 +268,13 @@ We can create spaghetti or volatility plots to elucidate changes over time on a 
                palette_input = this_palette,
                title = "Spaghetti Plot",
                subtitle = NULL) +
-  ggplot2::xlab("Infant Age (Days)") +
+  ggplot2::xlab("Infant Age (timepoint)") +
   ggplot2::ylab("Relative Abundance (log CPM)")
 ```
 
-### Stacked bar plot
+Here we plot changes in the **Staphylococcus** log counts per million (CPM) across time points. The spaghetti plot format clues us into the few outlier infants in the control group that seem to have extremely high counts in the first few weeks of life.
+
+### Stacked bar plots
 
 Stacked bar plots are used here to visualize the relative abundance of microbes at a given taxonomic level in each sample, represented as a single bar, labeled by time point, and plotted within each HIV exposure status group for separate mothers and infant comparisons. Use `plot_stacked_bar`.
 ```{R}
@@ -280,8 +284,10 @@ plot_stacked_bar(dat_filt, "genus",
              palette_input = this_palette)
 ```
 
+We see from the stacked bar plots that many of the microbes seem to maintain similar trends in both control and HIV-E infants over time, with **Streptococcus** producing slightly higher abundances in the HIV-E group.
 
-### Stacked area chart
+### Stacked area charts
+
 Stacked area charts are similar to stacked bar plots, but provide for continuity between time points. These are created with `plot_stacked_area()`.  
 
 ```{R}
@@ -291,7 +297,10 @@ plot_stacked_area(dat_filt, "genus",
                   palette_input = this_palette)
 ```
 
-### Heatmap
+The stacked area chart is offers a similar method of visualizing the data.
+
+### Heatmaps
+
 With `plot_heatmap`, you can plot a heatmap of a specific microbe to determine changes along one or more covariates. 
 
 ```{R}
@@ -315,6 +324,8 @@ p <- plot_heatmap(inputData = this_taxon,
                   column_order = NULL
 )
 ```
+
+From the heatmap, we find that clustering does not seem to find a clear relationship between genera (on the rows) and samples (on the columns). Three annotations were plotted on the top bar: time point, HIV status, and pairing.
 
 # Longitudinal data analysis
 

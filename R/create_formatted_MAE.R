@@ -57,7 +57,7 @@
 
 create_formatted_MAE <- function(counts_dat = NULL, tax_dat = NULL, metadata_dat = NULL,
                                  tree_SE = NULL) {
-    if (class(tree_SE) == "TreeSummarizedExperiment") {
+    if (methods::is(tree_SE, "TreeSummarizedExperiment")) {
         counts_dat <- SummarizedExperiment::assays(tree_SE)[[1]]
         tax_dat <-SummarizedExperiment::rowData(tree_SE)
         metadata_dat <- SummarizedExperiment::colData(tree_SE) |> as.data.frame() 

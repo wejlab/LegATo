@@ -30,6 +30,7 @@ get_long_data <- function(dat, taxon_level, log = FALSE,
                           counts_to_CPM = FALSE) {
   SE_obj <- dat[["MicrobeGenetics"]]
   assay_name <- names(SummarizedExperiment::assays(SE_obj))[1]
+  which_assay <- assay_name
   if (log | counts_to_CPM) {
     # Check that TBSP is installed
     if (!requireNamespace("TBSignatureProfiler", quietly = TRUE)) {

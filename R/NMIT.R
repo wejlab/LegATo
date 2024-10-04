@@ -17,7 +17,7 @@ safe_cor <- function(x, y = NULL, method = "pearson") {
     df <- x[, colSums(x) != 0]
     tryCatch({
         # Try to compute the correlation
-        result <- cor(x = df, y, method = method)
+        result <- stats::cor(x = df, y, method = method)
         return(result)
     }, error = function(e) {
         # If an error occurs (like zero standard deviation), return NA or a custom message

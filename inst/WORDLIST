@@ -1,5 +1,4 @@
 Agresti
-Bokulich
 CJ
 CPM
 ComplexHeatmap
@@ -12,13 +11,12 @@ Hotelling's
 Hotelling’s
 Huilin
 JGEEs
+Kraken
+LM
 LMEMs
 LMM
 LMMs
 Liang
-MAEs
-MSystems
-Mabey
 MetaScope
 Microbiome
 MultiAssayExperiment
@@ -33,6 +31,7 @@ Pre
 SNE
 SummarizedExperiment
 TOolkit
+TreeSummarizedExperiment
 Zeger
 Zenodo
 al
@@ -63,6 +62,7 @@ lmerTest
 mEtaGenomic
 metagenomic
 microbiome
+microbiota
 nasopharyngeal
 num
 pearson
