@@ -416,12 +416,7 @@ output <- run_gee_model(dat_1, unit_var = "Subject",
               plot_terms = "timepoint",
               width = 6, height = 4, units = "in", scale = 0.7)
 
-list.files(tempfolder)
-
-knitr::include_graphics(file.path(tempfolder, "Dolosigranulum_timepoint.png"))
-knitr::include_graphics(file.path(tempfolder, "Streptococcus_timepoint.png"))
-
-unlink(tempfolder, recursive = TRUE)
+list.files(tempfolder) |> head()
 ```
 
 ### Linear Mixed Models
