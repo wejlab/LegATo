@@ -78,7 +78,7 @@
       for_testing <- input_data %>% dplyr::filter(.data$Taxon == tax)
       out_test <- stats::t.test(stats::formula("Abundance ~ Populations"), for_testing,
                                 alternative = "two.sided",
-                                var.equal = FALSE, paired = FALSE)
+                                var.equal = FALSE)
       return(list(t = out_test$statistic, df = out_test$parameter,
                   diff_means = out_test$estimate[1],
                   CI_2.5 = out_test$conf.int[1],
