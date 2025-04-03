@@ -21,9 +21,8 @@ run_lmm_model(
 
 \item{taxon_level}{Character string, default is \code{"genus"}.}
 
-\item{unit_var}{Character string giving the variable containing the identifiers
-for the unit on which multiple measurements were conducted, e.g. subjects. Default is
-\code{NULL}; must be supplied if \code{paired = FALSE}.}
+\item{unit_var}{A character string identifying the unit variable for which
+there are multiple observations. Required.}
 
 \item{fixed_cov}{A character vector naming covariates to be tested.}
 

@@ -74,6 +74,8 @@ test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
 #' "bonferroni", "BH", "BY", "fdr", "none")}
 #'
 #' @inheritParams test_hotelling_t2
+#' @param unit_var A character string identifying the unit variable for which
+#' there are multiple observations. Required.
 #' @param fixed_cov A character vector naming covariates to be tested.
 #' @param corstr A character string specifying the correlation structure. The
 #'   following are permitted: '"independence"', '"exchangeable"', '"ar1"',

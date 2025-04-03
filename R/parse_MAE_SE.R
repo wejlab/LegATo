@@ -48,7 +48,7 @@ parse_MAE_SE <- function(dat, which_assay = NULL, type = "MAE") {
   tax_table <- as.data.frame(SummarizedExperiment::rowData(microbe))
   sam_table <- as.data.frame(SummarizedExperiment::colData(microbe))
   counts_table <- as.data.frame(SummarizedExperiment::assay(
-    microbe, "MGX"))[, rownames(sam_table)]
+    microbe, which_assay))[, rownames(sam_table)]
   
   list(counts = counts_table,
        sam = sam_table,
