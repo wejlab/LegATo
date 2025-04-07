@@ -4,11 +4,19 @@
 \alias{clean_MAE}
 \title{Clean up taxon names in a MultiAssayExperiment}
 \usage{
-clean_MAE(dat)
+clean_MAE(dat, which_experiment = NULL, which_assay = NULL)
 }
 \arguments{
 \item{dat}{A \code{MultiAssayExperiment} object specially formatted as an
 animalcules output.}
+
+\item{which_experiment}{Character string. If \code{type = "MAE"}, then
+this is the name of the experiment to be accessed. If \code{NULL},
+will default to the first available experiment.}
+
+\item{which_assay}{Character string. Regardless of whether 
+\code{type = "MAE"} or \code{"SE"}, this is the name of the selected
+\code{SummarizedExperiment} object. If \code{NULL}, defaults to first listed.}
 }
 \value{
 An animalcules-formatted \code{MultiAssayExperiment} object with

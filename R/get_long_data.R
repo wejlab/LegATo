@@ -42,8 +42,8 @@ get_long_data <- function(dat, taxon_level, log = FALSE,
                                            output_name = "assay",
                                            log = log, counts_to_CPM = counts_to_CPM)
     if (log) which_assay <- "log_assay"
-    if (counts_to_CPM) which_assay <- "assay_CPM"
-    if (log && counts_to_CPM) which_assay <- "log_assay_CPM"
+    if (counts_to_CPM) which_assay <- "assay_cpm"
+    if (log && counts_to_CPM) which_assay <- "log_assay_cpm"
   }
   
   microbe <- parse_MAE_SE(SE_obj, which_assay = which_assay, type = "SE")

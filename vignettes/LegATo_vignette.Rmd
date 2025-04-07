@@ -190,7 +190,7 @@ dat_filt <- filter_animalcules_MAE(dat_cleaned, 0.05)
 If you want to take a closer look at your data, you can easily extract it into the counts, taxonomy, and sample metadata tables using the `parse_MAE_SE()` function.
 
 ```{R}
-parsed <- parse_MAE_SE(dat_filt, which_assay = "MicrobeGenetics", type = "MAE")
+parsed <- parse_MAE_SE(dat_filt, type = "MAE")
 
 parsed$counts[seq_len(5), seq_len(5)] |> 
   knitr::kable(caption = "Counts Table")

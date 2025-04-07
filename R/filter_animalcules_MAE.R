@@ -27,7 +27,8 @@ utils::globalVariables(".")
 filter_animalcules_MAE <- function(dat, filter_prop = 0.001) {
     if(filter_prop <= 0 | filter_prop >= 1) stop("filter_prop must be between 0 and 1.")
     # Extract metadata, taxonomic info, and counts
-    parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
+    parsed <- parse_MAE_SE(dat, which_experiment = "MicrobeGenetics",
+                           which_assay = "MGX", type = "MAE")
     tax_table <- parsed$tax
     sam_table <- parsed$sam
     counts_table <- parsed$counts

@@ -4,15 +4,19 @@
 \alias{parse_MAE_SE}
 \title{Parse a MultiExperimentAssay object and extract the elements as data.frames}
 \usage{
-parse_MAE_SE(dat, which_assay = NULL, type = "MAE")
+parse_MAE_SE(dat, which_experiment = NULL, which_assay = NULL, type = "MAE")
 }
 \arguments{
 \item{dat}{Either a \code{MultiAssayExperiment} or a
 \code{SummarizedExperiment} object.}
 
-\item{which_assay}{Character string. This refers to the assay to be extracted
-from the MultiAssayExperiment object if \code{type = "MAE"}. Does not need
-to be specified if \code{type = "SE"}. Default is \code{NULL}.}
+\item{which_experiment}{Character string. If \code{type = "MAE"}, then
+this is the name of the experiment to be accessed. If \code{NULL},
+will default to the first available experiment.}
+
+\item{which_assay}{Character string. Regardless of whether 
+\code{type = "MAE"} or \code{"SE"}, this is the name of the selected
+\code{SummarizedExperiment} object. If \code{NULL}, defaults to first listed.}
 
 \item{type}{One of "MAE" denoting a \code{MultiAssayExperiment} or "SE"
 denoting a \code{SummarizedExperiment}.}

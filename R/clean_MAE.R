@@ -6,6 +6,7 @@
 #' as "others" with "sp." and finally replaces underscores with spaces.
 #'
 #' @inheritParams plot_stacked_bar
+#' @inheritParams parse_MAE_SE
 #'
 #' @returns An animalcules-formatted \code{MultiAssayExperiment} object with
 #'   cleaned-up taxonomy nomenclature.
@@ -18,9 +19,10 @@
 #' clean_MAE(in_dat)
 #'
 
-clean_MAE <- function(dat) {
+clean_MAE <- function(dat, which_experiment = NULL, which_assay = NULL) {
   # Extract data
-  parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
+  parsed <- parse_MAE_SE(dat, which_experiment = which_experiment,
+                         which_assay = which_assay, type = "MAE")
   tax_table <- parsed$tax
   counts_table <- parsed$counts
   # Preliminary fixing of species names

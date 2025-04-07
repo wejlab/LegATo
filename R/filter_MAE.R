@@ -36,7 +36,7 @@ filter_MAE <- function(dat, relabu_threshold = 3, occur_pct_cutoff = 5,
   }
   
   # Extract metadata, taxonomic info, and counts
-  parsed <- parse_MAE_SE(dat, which_assay = "MicrobeGenetics", type = "MAE")
+  parsed <- parse_MAE_SE(dat, type = "MAE")
   tax_table <- parsed$tax
   sam_table <- parsed$sam
   counts_table <- parsed$counts

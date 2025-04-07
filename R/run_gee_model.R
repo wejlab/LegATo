@@ -19,42 +19,44 @@ mk_gee_plot <- function(this_coef, complex, tn, unit_var,
 test_models_gee <- function(tn, input_df, unit_var, fixed_cov,
                             corstr, plot_out,
                             plotsave_loc, plot_terms, ...) {
-  if (!requireNamespace("geepack", quietly = TRUE)) {
-    message("The 'geepack' package is not installed",
-            "Please install it from CRAN to use this function.")
-  }
-  filt_df <- input_df %>% 
-    dplyr::mutate("unit_var" = as.factor(input_df[, unit_var])) %>%
-    dplyr::filter(.data$taxon == tn) %>%
-    dplyr::arrange(.data$unit_var)
-  group_vars <- paste("Abundance ~", paste(fixed_cov, collapse = " + ")) %>%
-    stats::formula()
-  complex <- geepack::geeglm(group_vars, id = unit_var, data = filt_df,
-                             na.action = stats::na.omit, family = "gaussian",
-                             corstr = corstr)
-  if (requireNamespace("broom", quietly = TRUE) &&
-      requireNamespace("broom.mixed", quietly = TRUE)) {
-    sum_comp <- broom::tidy(complex, conf.int = TRUE)
-  } else {
-    message("The 'broom' and/or 'broom.mixed' packages are not installed",
-            "Please install them to use this function.")
-  }
-
-  if (plot_out) {
-    plyr::a_ply(fixed_cov, 1, mk_gee_plot, complex = complex, tn = tn,
-                plotsave_loc = plotsave_loc, plot_terms = plot_terms, ...)
-  }
-  res_out <- sum_comp %>%
-    dplyr::mutate("Taxon" = tn) %>%
-    dplyr::rename("Coefficient" = "term",
-                  "Coefficient Estimate" = "estimate",
-                  "Lower 95% CI" = "conf.low",
-                  "Upper 95% CI" = "conf.high",
-                  "Standard Error" = "std.error",
-                  "Statistic" = "statistic",
-                  "Pr(>|W|)" = "p.value") %>%
-    as.data.frame()
-  return(res_out)
+    if (!requireNamespace("geepack", quietly = TRUE)) {
+        message("The 'geepack' package is not installed",
+                "Please install it from CRAN to use this function.")
+    }
+    filt_df <- input_df %>% 
+        dplyr::mutate("unit_var" = as.factor(input_df[, unit_var])) %>%
+        dplyr::filter(.data$taxon == tn) %>%
+        dplyr::arrange(.data$unit_var) %>%
+        dplyr::mutate(dplyr::across(dplyr::where(is.character),
+                                    ~ as.factor(.)))
+    group_vars <- paste("Abundance ~", paste(fixed_cov, collapse = " + ")) %>%
+        stats::formula()
+    complex <- geepack::geeglm(group_vars, id = unit_var, data = filt_df,
+                               na.action = stats::na.omit, family = "gaussian",
+                               corstr = corstr)
+    if (requireNamespace("broom", quietly = TRUE) &&
+        requireNamespace("broom.mixed", quietly = TRUE)) {
+        sum_comp <- broom::tidy(complex, conf.int = TRUE)
+    } else {
+        message("The 'broom' and/or 'broom.mixed' packages are not installed",
+                "Please install them to use this function.")
+    }
+    
+    if (plot_out) {
+        plyr::a_ply(fixed_cov, 1, mk_gee_plot, complex = complex, tn = tn,
+                    plotsave_loc = plotsave_loc, plot_terms = plot_terms, ...)
+    }
+    res_out <- sum_comp %>%
+        dplyr::mutate("Taxon" = tn) %>%
+        dplyr::rename("Coefficient" = "term",
+                      "Coefficient Estimate" = "estimate",
+                      "Lower 95% CI" = "conf.low",
+                      "Upper 95% CI" = "conf.high",
+                      "Standard Error" = "std.error",
+                      "Statistic" = "statistic",
+                      "Pr(>|W|)" = "p.value") %>%
+        as.data.frame()
+    return(res_out)
 }
 
 #' Compute Generalized Estimating Equations (GEEs) on longitudinal microbiome
